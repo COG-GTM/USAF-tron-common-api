@@ -1,0 +1,178 @@
+# Spring Boot API Coding Conventions
+
+## Package Structure & Naming
+
+- Follow `mil.tron.commonapi.<layer>` package hierarchy
+- Organize layers: `controller`, `service`, `repository`, `entity`, `dto`, `exception`
+- Group related features in subpackages (e.g., `controller/documentspace`, `service/pubsub`)
+- Name entities with singular nouns (Person, Organization, not Persons)
+- Name DTOs with `Dto` suffix (PersonDto, OrganizationDto)
+- Name service implementations with `Impl` suffix (PersonServiceImpl)
+- Name repositories with `Repository` suffix (PersonRepository)
+
+## Controller Layer (@RestController)
+
+- Use constructor injection exclusively
+- No field injection (@Autowired on fields)
+- No business logic in controllers
+- Controllers only orchestrate: validate input, call service, return response
+- Annotate ALL public methods with @Operation and @ApiResponses
+- Include @Parameter annotations on all method parameters
+- Document expected responses: 200, 201, 203, 400, 404, 409 as appropriate
+- Use @PreAuthorize* custom annotations for authorization
+- Specify media types explicitly: consumes = MediaType.APPLICATION_JSON_VALUE
+- Map API paths with ${api-prefix.v1} and ${api-prefix.v2} properties
+- Return ResponseEntity<T> with explicit HttpStatus
+- Use Pageable with @ParameterObject for paginated endpoints
+- Use @Valid on @RequestBody parameters
+- V2 endpoints should use @WrappedEnvelopeResponse for collection responses
+
+## Service Layer (@Service)
+
+- Define interface and implementation (e.g., PersonService, PersonServiceImpl)
+- Use constructor injection exclusively
+- No field injection (@Autowired on fields)
+- All business logic lives in services
+- Services operate on DTOs externally, entities internally
+- Use @Transactional on methods that modify data
+- Convert entities to DTOs before returning to controller
+- Throw specific exceptions (RecordNotFoundException, BadRequestException, etc.)
+- Never swallow exceptions
+- Use DtoMapper or ModelMapper for entity-DTO conversion
+- Use @Lazy on circular dependencies (e.g., OrganizationService ↔ PersonService)
+
+## Repository Layer
+
+- Extend JpaRepository<Entity, UUID> or CrudRepository<Entity, UUID>
+- Add JpaSpecificationExecutor<Entity> for filtering/specification support
+- Use Optional<T> return types for find methods
+- Name query methods following Spring Data conventions (findBy*, existsBy*)
+- Annotate with @Repository
+- Define custom repository interfaces as <Entity>RepositoryCustom if needed
+- Use @Transactional on delete operations
+- Use @Query for complex queries with specific projections
+
+## Entity Layer (@Entity)
+
+- Use Lombok annotations: @AllArgsConstructor, @NoArgsConstructor, @Builder, @Getter, @Setter
+- Use UUID as primary key type
+- Use @Builder.Default for collections and UUIDs: `@Builder.Default private UUID id = UUID.randomUUID()`
+- Use @CreationTimestamp and @UpdateTimestamp for audit fields
+- Use @ManyToOne, @OneToMany, @ManyToMany with explicit @JoinColumn or @JoinTable
+- Mark PII fields with @PiiField annotation
+- Mark protected fields with @ProtectedField annotation
+- Implement equals() and hashCode() based on id
+- Add @PrePersist and @PreUpdate methods for sanitization if needed
+- Use @JsonIgnore for constants and helper methods
+- Use @Table(uniqueConstraints = ...) for composite uniqueness
+
+## DTO Layer
+
+- Use Lombok annotations: @AllArgsConstructor, @NoArgsConstructor, @Builder, @Getter, @Setter, @EqualsAndHashCode
+- Use javax.validation annotations: @Valid, @Email, @Size, @NotNull
+- Use custom validation annotations from mil.tron.commonapi.validations
+- Mark PII fields with @PiiField annotation
+- Mark readonly fields with @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+- Mark non-patchable fields with @NonPatchableField
+- Use @JsonInclude(JsonInclude.Include.NON_NULL) on optional fields
+- Use @Schema annotations for OpenAPI documentation
+- Use @Builder.Default for collections and UUIDs
+- Keep DTOs in mil.tron.commonapi.dto package
+
+## Exception Handling
+
+- Throw specific exceptions: RecordNotFoundException, BadRequestException, ResourceAlreadyExistsException
+- All custom exceptions in mil.tron.commonapi.exception package
+- Use @ControllerAdvice for global exception handling
+- ExceptionResponse shape: timestamp, status, error, reason, path, errors (optional)
+- Never catch and swallow exceptions
+- Log exceptions in @ControllerAdvice handlers, not in services
+- Return appropriate HTTP status codes with exception responses
+- Use IllegalModificationBaseException for EFA (Entity Field Authority) violations
+
+## Validation
+
+- Use javax.validation annotations on DTOs: @Valid, @Email, @Size, @NotNull
+- Custom validators in mil.tron.commonapi.validations package
+- Use @ValidDodId for DOD ID validation
+- Use @ValidPhoneNumber for phone validation
+- Use @NullOrNotBlankValidation for optional strings
+- Apply @Valid to @RequestBody parameters in controllers
+- Services should assume DTOs are pre-validated by controller layer
+- Throw BadRequestException for business validation failures
+
+## Logging
+
+- Use Apache Commons Logging: `private final Log logger = LogFactory.getLog(CommonApiLogger.class)`
+- Do NOT use @Slf4j or java.util.logging
+- Log at WARN level for: exceptions, data integrity issues, security events
+- Log at INFO level for: significant business operations (optional)
+- Do NOT log at DEBUG level in production code
+- Log structured messages: include entity IDs, operation type, relevant context
+- Redact PII in log messages
+- Log in @ControllerAdvice exception handlers, not in services
+- Include sanitized request/response bodies for trace logging
+
+## OpenAPI Documentation
+
+- Annotate all @RestController classes
+- Add @Operation(summary = "...", description = "...") on every public method
+- Add @ApiResponses with all expected response codes
+- Add @ApiResponse for each status: 200, 201, 203, 400, 404, 409
+- Include content = @Content(schema = @Schema(implementation = Dto.class))
+- Use @Parameter on all method parameters with description
+- Use @Schema on DTO fields for documentation
+- Use ExceptionResponse.class for error response schemas
+- Document pagination headers with @Header annotation
+
+## Testing
+
+- Place tests in src/test/java mirroring src/main/java structure
+- Name tests: <ClassName>Test.java
+- Use @ExtendWith(SpringExtension.class) with @SpringBootTest
+- Use @TestPropertySource(locations = "classpath:application-test.properties")
+- Use @AutoConfigureMockMvc for controller tests
+- Use @MockBean for service dependencies
+- Use @WithMockUser for authentication tests
+- Use JUnit 5: @Test, @BeforeEach, @Nested
+- Use AssertJ for assertions: assertThat()
+- Use Mockito for mocking: when(), verify(), ArgumentCaptor
+- Test controllers via MockMvc: perform(), andExpect()
+- Aim for unit tests on services, integration tests on controllers
+
+## Security
+
+- Use custom @PreAuthorize* annotations defined in mil.tron.commonapi.annotation.security
+- Examples: @PreAuthorizePersonRead, @PreAuthorizePersonCreate, @PreAuthorizePersonEdit, @PreAuthorizePersonDelete
+- Use @PreAuthorizeOnlySSO for SSO-only endpoints
+- Apply security annotations at controller method level
+- Extract authenticated user via Authentication parameter (optional)
+- Do NOT implement authorization logic in services
+- Use @PiiField to mark sensitive data
+- Use @ProtectedField for EFA-controlled fields
+
+## What NOT to Do
+
+- NO field injection: never use @Autowired on fields
+- NO business logic in controllers
+- NO swallowed exceptions: never catch without rethrowing or logging
+- NO direct entity exposure: always convert to DTO
+- NO hardcoded values: use application.properties with @Value or ApplicationProperties
+- NO @Slf4j or other logging frameworks: use Apache Commons Log
+- NO returning List<Entity> from controllers: use DTOs
+- NO missing OpenAPI annotations on public endpoints
+- NO validation logic in services: validate in DTOs
+- NO raw SQL in repositories: use @Query with JPQL or query methods
+- NO DELETE without @Transactional
+- NO Optional as method parameter type
+- NO exposing internal error details to clients: use generic messages for 500 errors
+- NO deprecated endpoints without @Deprecated and documentation
+
+## Optional Conventions
+
+- (Optional) Use @CacheConfig and caching annotations on services
+- (Optional) Use @Transactional(readOnly = true) for read operations
+- (Optional) Use Specification pattern for complex filtering
+- (Optional) Use @JsonIgnore on utility methods in entities
+- (Optional) Use @Builder.Default for default values
+- (Optional) Add JavaDoc comments on complex service methods
