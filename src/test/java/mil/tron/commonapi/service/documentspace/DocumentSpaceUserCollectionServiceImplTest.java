@@ -109,12 +109,25 @@ class DocumentSpaceUserCollectionServiceImplTest {
     void testAddingEntryToCollection() {
         UUID fileEntryId = UUID.randomUUID();
         UUID collectionId = entity.getId();
-        DocumentSpaceFileSystemEntry fileSystemEntry = DocumentSpaceFileSystemEntry.builder().id(fileEntryId).build();
+        DocumentSpaceFileSystemEntry fileSystemEntry = DocumentSpaceFileSystemEntry.builder().id(fileEntryId).documentSpaceId(entity.getDocumentSpaceId()).build();
 
         doReturn(Optional.of(fileSystemEntry)).when(documentSpaceFileSystemEntryRepository).findById(fileEntryId);
         doReturn(Optional.of(entity)).when(documentSpaceUserCollectionRepository).findById(collectionId);
 
         Assertions.assertDoesNotThrow(()->collectionService.addFileSystemEntryToCollection(fileEntryId, collectionId));
+    }
+
+    @Test
+    void testAddingEntryToCollection_ThrowsWhenEntryFromDifferentSpace() {
+        UUID fileEntryId = UUID.randomUUID();
+        UUID collectionId = entity.getId();
+        DocumentSpaceFileSystemEntry fileSystemEntry = DocumentSpaceFileSystemEntry.builder().id(fileEntryId).documentSpaceId(UUID.randomUUID()).build();
+
+        doReturn(Optional.of(fileSystemEntry)).when(documentSpaceFileSystemEntryRepository).findById(fileEntryId);
+        doReturn(Optional.of(entity)).when(documentSpaceUserCollectionRepository).findById(collectionId);
+
+        Assertions.assertThrows(RecordNotFoundException
+                .class, () -> collectionService.addFileSystemEntryToCollection(fileEntryId, collectionId));
     }
 
     @Test

@@ -128,6 +128,9 @@ public class DocumentSpaceUserCollectionServiceImpl implements DocumentSpaceUser
 
         if(entryById.isPresent() && collectionById.isPresent()){
             DocumentSpaceUserCollection documentSpaceUserCollection = collectionById.get();
+            if(!entryById.get().getDocumentSpaceId().equals(documentSpaceUserCollection.getDocumentSpaceId())){
+                throw new RecordNotFoundException("FileEntry not found");
+            }
             documentSpaceUserCollection.getEntries().add(entryById.get());
             documentSpaceUserCollectionRepository.save(documentSpaceUserCollection);
         }else if(entryById.isEmpty()){
