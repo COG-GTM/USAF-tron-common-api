@@ -818,7 +818,7 @@ public class DocumentSpaceController {
 					description = "Entry already exists in the favorites collection",
 					content = @Content(schema = @Schema(implementation = ExceptionResponse.class))),
 	})
-	@PreAuthorize("(hasAuthority('DASHBOARD_ADMIN') || @accessCheckDocumentSpace.hasDocumentSpaceAccess(authentication))and #principal != null")
+	@PreAuthorize("(hasAuthority('DASHBOARD_ADMIN') || @accessCheckDocumentSpace.hasReadAccess(authentication, #id)) and #principal != null")
 	@PostMapping("/spaces/{id}/collection/favorite/{entryId}")
 	public ResponseEntity<Void> addEntityToFavorites(@PathVariable UUID id, @PathVariable UUID entryId, Principal principal){
 
@@ -840,7 +840,7 @@ public class DocumentSpaceController {
 					description = "Entry already exists in the favorites collection",
 					content = @Content(schema = @Schema(implementation = ExceptionResponse.class))),
 	})
-	@PreAuthorize("(hasAuthority('DASHBOARD_ADMIN') || @accessCheckDocumentSpace.hasDocumentSpaceAccess(authentication)) and #principal != null")
+	@PreAuthorize("(hasAuthority('DASHBOARD_ADMIN') || @accessCheckDocumentSpace.hasReadAccess(authentication, #id)) and #principal != null")
 	@PostMapping("/spaces/{id}/collection/favorite/")
 	public ResponseEntity<Void> addPathEntityToFavorites(@PathVariable UUID id, @Valid @RequestBody DocumentSpacePathItemsDto dto, Principal principal) {
 		documentSpaceUserCollectionService.addFileSystemEntryToCollection(principal.getName(), id, dto);
@@ -858,7 +858,7 @@ public class DocumentSpaceController {
 					description = "Forbidden",
 					content = @Content(schema = @Schema(implementation = ExceptionResponse.class))),
 	})
-	@PreAuthorize("(hasAuthority('DASHBOARD_ADMIN') || @accessCheckDocumentSpace.hasDocumentSpaceAccess(authentication))and #principal != null")
+	@PreAuthorize("(hasAuthority('DASHBOARD_ADMIN') || @accessCheckDocumentSpace.hasReadAccess(authentication, #id)) and #principal != null")
 	@DeleteMapping("/spaces/{id}/collection/favorite/")
 	public ResponseEntity<Void> removePathEntityFromFavorites(@PathVariable UUID id, @Valid @RequestBody DocumentSpacePathItemsDto dto, Principal principal) {
 		documentSpaceUserCollectionService.removeFileSystemEntryToCollection(principal.getName(), id, dto);
@@ -878,7 +878,7 @@ public class DocumentSpaceController {
 					description = "Forbidden",
 					content = @Content(schema = @Schema(implementation = ExceptionResponse.class))),
 	})
-	@PreAuthorize("(hasAuthority('DASHBOARD_ADMIN') || @accessCheckDocumentSpace.hasDocumentSpaceAccess(authentication)) and #principal != null")
+	@PreAuthorize("(hasAuthority('DASHBOARD_ADMIN') || @accessCheckDocumentSpace.hasReadAccess(authentication, #id)) and #principal != null")
 	@DeleteMapping("/spaces/{id}/collection/favorite/{entryId}")
 	public ResponseEntity<Void> removeEntityFromFavorites(@PathVariable UUID id, @PathVariable UUID entryId, Principal principal){
 		documentSpaceUserCollectionService.removeEntityFromFavoritesFolder(principal.getName(), entryId, id);
@@ -897,7 +897,7 @@ public class DocumentSpaceController {
 					description = "Forbidden",
 					content = @Content(schema = @Schema(implementation = ExceptionResponse.class)))
 	})
-	@PreAuthorize("(hasAuthority('DASHBOARD_ADMIN') || @accessCheckDocumentSpace.hasDocumentSpaceAccess(authentication)) and #principal != null")
+	@PreAuthorize("(hasAuthority('DASHBOARD_ADMIN') || @accessCheckDocumentSpace.hasReadAccess(authentication, #id)) and #principal != null")
 	@GetMapping("/spaces/{id}/collection/favorite")
 	public ResponseEntity<DocumentSpaceUserCollectionResponseDtoWrapper> getFavorites(@PathVariable UUID id, Principal principal){
 		DocumentSpaceUserCollectionResponseDtoWrapper response = new DocumentSpaceUserCollectionResponseDtoWrapper();
@@ -917,7 +917,7 @@ public class DocumentSpaceController {
 					description = "Forbidden",
 					content = @Content(schema = @Schema(implementation = ExceptionResponse.class)))
 	})
-	@PreAuthorize("(hasAuthority('DASHBOARD_ADMIN') || @accessCheckDocumentSpace.hasDocumentSpaceAccess(authentication)) and #principal != null")
+	@PreAuthorize("(hasAuthority('DASHBOARD_ADMIN') || @accessCheckDocumentSpace.hasReadAccess(authentication, #id)) and #principal != null")
 	@GetMapping("/spaces/{id}/path/{entryId}")
 	public ResponseEntity<String> getDocumentSpaceEntryPath(@PathVariable UUID id, @PathVariable UUID entryId, Principal principal){
 		return ResponseEntity.ok(documentSpaceFileSystemService.getFilePath(id, entryId));
