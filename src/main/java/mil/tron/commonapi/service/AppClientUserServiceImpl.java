@@ -421,6 +421,26 @@ public class AppClientUserServiceImpl implements AppClientUserService {
 	}
 
 	/**
+	 * Checks if "user" is the app client itself with the given name or is a developer
+	 * for the app client with the given name
+	 * @param appClientName the app client name
+	 * @param user the user name from request (could be the app client or a user's email)
+	 * @return true if above criteria is met
+	 */
+	@Override
+	public boolean userCanManageSubscriptionsForAppClient(String appClientName, String user) {
+		if (appClientName == null || user == null) return false;
+
+		// if the user from request is the app itself then return true
+		if (user.equalsIgnoreCase(appClientName)) return true;
+
+		Optional<AppClientUser> app = appClientRepository.findByNameIgnoreCase(appClientName);
+		if (app.isEmpty()) return false;
+
+		return userIsAppClientDeveloperForApp(app.get().getId(), user);
+	}
+
+	/**
 	 * Private helper that removes one or all developers from an app client
 	 * @param appClient the app client entity to modify
 	 * @param email email of the developer to remove

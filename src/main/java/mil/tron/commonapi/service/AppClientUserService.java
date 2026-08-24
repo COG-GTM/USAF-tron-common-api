@@ -18,6 +18,7 @@ public interface AppClientUserService {
 	AppClientUserDto updateAppClientDeveloperItems(UUID id, AppClientUserDto appClient);
 	boolean userIsAppClientDeveloperForApp(UUID id, String email);
 	boolean userIsAppClientDeveloperForAppSubscription(UUID subscriptionId, String user);
+	boolean userCanManageSubscriptionsForAppClient(String appClientName, String user);
 	void deleteDeveloperFromAllAppClient(DashboardUser user);
 	Iterable<AppClientUser> getAppClientUsersContainingDeveloperEmail(String developerEmail);
 }

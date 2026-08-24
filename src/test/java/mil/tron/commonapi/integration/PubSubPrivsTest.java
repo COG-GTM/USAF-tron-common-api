@@ -120,8 +120,8 @@ public class PubSubPrivsTest {
         // add them to GA
         AppClientUser guardianAngel = appClientUserRespository.findByNameIgnoreCase("guardianangel").get();
         guardianAngel.setPrivileges(Set.of(this.getPersonRead()));
-        appClientUserRespository.save(guardianAngel);
         guardianAngel.setAppClientDevelopers(Set.of(devUser));
+        appClientUserRespository.save(guardianAngel);
 
 
         // add the dashboard dev user for general use
@@ -147,6 +147,14 @@ public class PubSubPrivsTest {
         appClientUserRespository
                 .findByNameIgnoreCase("NewApp")
                 .ifPresent(client -> appClientUserRespository.delete(client));
+
+        // detach the dev user from GA
+        appClientUserRespository
+                .findByNameIgnoreCase("guardianangel")
+                .ifPresent(client -> {
+                    client.setAppClientDevelopers(new HashSet<>());
+                    appClientUserRespository.save(client);
+                });
 
         // clean up users
         dashboardUserRepository.deleteById(adminId);
