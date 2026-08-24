@@ -8,8 +8,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 /**
  * Authorizes new subscription if the request is from a:
  *  - DASHBOARD_ADMIN, or
- *  - Requesting entity is a registered APP_CLIENT itself, or
- *  - Requesting entity is an APP_CLIENT_DEVELOPER of a registered app client
+ *  - Requesting entity is the registered APP_CLIENT named in the request body itself, or
+ *  - Requesting entity is an APP_CLIENT_DEVELOPER of the app client named in the request body
  *
  *  Authorizes update of an EXISTING subscription if the request is from a:
  *  - DASHBOARD_ADMIN, or
@@ -26,8 +26,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
         //   req is from the app client itself (namespace in subscribers URI equals user (app) in request principal)
         "@appClientUserServiceImpl.userIsAppClientDeveloperForAppSubscription(#subscriber.getId(), authentication.getName()) : " +
 
-        // otherwise, if subscription is new, then any APP_CLIENT or APP_CLIENT_DEVELOPER is permitted
-        "(hasAuthority('APP_CLIENT') || hasAuthority('APP_CLIENT_DEVELOPER'))) " +
+        // otherwise, if subscription is new, then requester must be an APP_CLIENT or APP_CLIENT_DEVELOPER
+        //   AND be the app client named in the request body (or a developer of it)
+        "((hasAuthority('APP_CLIENT') || hasAuthority('APP_CLIENT_DEVELOPER')) " +
+        "&& @appClientUserServiceImpl.userCanManageSubscriptionsForAppClient(#subscriber.getAppClientUser(), authentication.getName()))) " +
 
         // if we get here, then DASHBOARD_ADMIN always trumps all
         "|| hasAuthority('DASHBOARD_ADMIN')")

@@ -111,7 +111,9 @@ public class SubscriberController {
     @PreAuthorizeSubscriptionCreation
     @PostMapping({"${api-prefix.v1}/subscriptions", "${api-prefix.v2}/subscriptions"})
     public ResponseEntity<SubscriberDto> createSubscription(@Valid @RequestBody SubscriberDto subscriber) {
-        return new ResponseEntity<>(subService.upsertSubscription(subscriber), HttpStatus.OK);
+        SubscriberDto item = subService.upsertSubscription(subscriber);
+        item.setSecret("");  // sanitize secret from going outbound
+        return new ResponseEntity<>(item, HttpStatus.OK);
     }
 
     //
@@ -129,7 +131,7 @@ public class SubscriberController {
     public ResponseEntity<SubscriberDto> getSubscription(@PathVariable UUID id) {
         SubscriberDto item = subService.getSubscriberById(id);
         item.setSecret("");  // sanitize secret from going outbound
-        return new ResponseEntity<>(subService.getSubscriberById(id), HttpStatus.OK);
+        return new ResponseEntity<>(item, HttpStatus.OK);
     }
 
     //
