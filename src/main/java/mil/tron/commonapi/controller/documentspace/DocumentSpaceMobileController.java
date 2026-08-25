@@ -151,7 +151,7 @@ public class DocumentSpaceMobileController {
                     description = "Forbidden (Requires Read privilege to document space, or DASHBOARD_ADMIN)",
                     content = @Content(schema = @Schema(implementation = ExceptionResponse.class)))
     })
-    @PreAuthorize("(hasAuthority('DASHBOARD_ADMIN') || @accessCheckDocumentSpace.hasDocumentSpaceAccess(authentication)) and #principal != null")
+    @PreAuthorize("(hasAuthority('DASHBOARD_ADMIN') || @accessCheckDocumentSpace.hasReadAccess(authentication, #id)) and #principal != null")
     @GetMapping("/spaces/{id}/contents")
     public ResponseEntity<S3MobilePaginationDto> dumpContentsAtPath(@PathVariable UUID id,
                                                                     Principal principal,
