@@ -249,7 +249,7 @@ public class SpecificationBuilder {
 			} catch (IllegalArgumentException ex) {
 				throw new BadRequestException(
 						i > 0
-								? String.format("Field Path [%s] has an invalid nested property at [position: %d, value: %s]; nested property is invalid",
+								? String.format("Field Path [%s] failed at [position: %d, value: %s]: nested property is invalid",
 										String.join(",", pathToField), i, pathToField[i])
 								: String.format("Field Path [%s] failed at [position: %d, value: %s]: path does not exist",
 										String.join(",", pathToField), i, pathToField[i]));

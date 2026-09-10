@@ -201,6 +201,6 @@ public class HttpTraceIntegrationTest {
         assertEquals(size+5, httpLogsRepository.findAll().size());
         HttpLogEntry entry5 = httpLogsRepository.findAll().get(size+4);
         assertEquals(403, entry5.getStatusCode());
-        assertTrue(entry5.getResponseBody().contains("denied"));
+        assertTrue(entry5.getResponseBody().contains("Access Denied"));
     }
 }

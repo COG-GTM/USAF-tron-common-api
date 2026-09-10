@@ -126,9 +126,6 @@ public class HttpTraceService implements HttpExchangeRepository {
 
             String responseBody = contentTrace.getResponseBody();
             String errorMessage = contentTrace.getErrorMessage();
-            if (responseBody == null && "Access Denied".equals(errorMessage)) {
-                errorMessage = "Access is denied";
-            }
             httpLogsRepository.save(
                     HttpLogEntry
                             .builder()

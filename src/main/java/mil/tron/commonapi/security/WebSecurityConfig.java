@@ -59,10 +59,6 @@ public class WebSecurityConfig {
 				.csrf(csrf -> csrf.disable())
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.addFilterBefore(traceRequestFilter, ExceptionTranslationFilter.class)
-				.exceptionHandling(exceptionHandling -> exceptionHandling.accessDeniedHandler((request, response, exception) -> {
-					response.setStatus(403);
-					response.getWriter().write("Access is denied");
-				}))
 				.headers(headers -> headers.contentSecurityPolicy(csp ->
 						csp.policyDirectives("default-src 'self' 'unsafe-inline' 'unsafe-eval' *.dso.mil data:")));
 		return http.build();
