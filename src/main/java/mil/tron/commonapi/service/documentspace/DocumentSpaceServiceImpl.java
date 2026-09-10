@@ -6,7 +6,8 @@ import com.amazonaws.services.s3.model.*;
 import com.amazonaws.services.s3.model.MultiObjectDeleteException.DeleteError;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.Upload;
-import liquibase.util.csv.opencsv.CSVReader;
+import com.opencsv.CSVReader;
+import com.opencsv.exceptions.CsvException;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import mil.tron.commonapi.annotation.minio.IfMinioEnabledOnIL4OrDevLocal;
@@ -31,7 +32,7 @@ import mil.tron.commonapi.service.documentspace.util.S3ObjectAndFilename;
 import mil.tron.commonapi.validations.DocSpaceFolderOrFilenameValidator;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.io.FilenameUtils;
-import org.assertj.core.util.Lists;
+import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -40,8 +41,8 @@ import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.transaction.Transactional;
-import javax.validation.constraints.NotNull;
+import jakarta.transaction.Transactional;
+import jakarta.validation.constraints.NotNull;
 import java.io.*;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
@@ -152,6 +153,7 @@ public class DocumentSpaceServiceImpl implements DocumentSpaceService {
 		DocumentSpace documentSpace = getDocumentSpaceOrElseThrow(documentSpaceId);
 
 		documentSpaceFileSystemService.deleteFolder(documentSpaceId, DocumentSpaceFileSystemServiceImpl.PATH_SEP);
+		documentSpaceFileSystemService.deleteAllEntries(documentSpaceId);
 
 		unsetDashboardUsersDefaultDocumentSpace(documentSpace);
 		
@@ -749,7 +751,7 @@ public class DocumentSpaceServiceImpl implements DocumentSpaceService {
 	@Transactional(dontRollbackOn={RecordNotFoundException.class})
 	@Override
 	public void deleteFile(UUID documentSpaceId, String path, String file) throws RecordNotFoundException {
-		getDocumentSpaceOrElseThrow(documentSpaceId);
+		DocumentSpace documentSpace = getDocumentSpaceOrElseThrow(documentSpaceId);
 		FilePathSpec filePathSpec = documentSpaceFileSystemService.parsePathToFilePathSpec(documentSpaceId, path);
 		String prefix = getPathPrefix(documentSpaceId, path, filePathSpec);
 		
@@ -759,6 +761,7 @@ public class DocumentSpaceServiceImpl implements DocumentSpaceService {
 		if (documentSpaceFile == null) {
 			log.warn("Could not delete Document Space File: it does not exist in the database");
 		} else {
+			documentSpace.removeFileSystemEntry(documentSpaceFile);
 			documentSpaceFileService.deleteDocumentSpaceFile(documentSpaceFile);
 			documentSpaceFileSystemService.propagateModificationStateToAncestors(documentSpaceFile);
 		}
@@ -1220,7 +1223,7 @@ public class DocumentSpaceServiceImpl implements DocumentSpaceService {
 					}
 				}
 			}
-		} catch (IOException e) {
+			} catch (IOException | CsvException e) {
 			throw new BadRequestException("Failed retrieving uploaded file");
 		}
 

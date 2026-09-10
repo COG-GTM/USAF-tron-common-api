@@ -14,7 +14,6 @@ import mil.tron.commonapi.repository.documentspace.DocumentSpaceFileSystemEntryR
 import mil.tron.commonapi.repository.documentspace.DocumentSpaceRepository;
 import mil.tron.commonapi.repository.documentspace.DocumentSpaceUserCollectionRepository;
 import mil.tron.commonapi.service.DashboardUserService;
-import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,6 +26,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 
@@ -73,7 +73,7 @@ class DocumentSpaceUserCollectionServiceImplTest {
 
 		doReturn(entity).when(documentSpaceUserCollectionRepository).save(Mockito.any());
 		DocumentSpaceUserCollection collectionResponse = collectionService.createFavoriteCollection(dto);
-		Assert.assertEquals(entity, collectionResponse);
+		assertEquals(entity, collectionResponse);
 	}
 
     @Test

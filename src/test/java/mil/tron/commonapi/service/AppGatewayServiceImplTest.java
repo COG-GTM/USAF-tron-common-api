@@ -7,15 +7,14 @@ import mil.tron.commonapi.dto.appsource.AppSourceDetailsDto;
 import mil.tron.commonapi.entity.appsource.AppSource;
 
 import org.apache.camel.*;
-import org.apache.camel.builder.AdviceWithRouteBuilder;
+import org.apache.camel.builder.AdviceWith;
 import org.apache.camel.component.mock.MockEndpoint;
-import org.apache.camel.test.spring.CamelSpringBootRunner;
+import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +25,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.server.ResponseStatusException;
 import org.apache.camel.builder.RouteBuilder;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -35,7 +34,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@RunWith(CamelSpringBootRunner.class)
+@CamelSpringBootTest
 @ExtendWith(MockitoExtension.class)
 @SpringBootTest
 @TestPropertySource(locations = "classpath:application-test.properties")
@@ -70,7 +69,7 @@ class AppGatewayServiceImplTest {
     	RouteBuilder mockRouteBuilder = new RouteBuilder(this.context) {
             @Override
             public void configure() throws Exception {
-                AdviceWithRouteBuilder.adviceWith(this.getContext(), GATEWAY_ID,
+                AdviceWith.adviceWith(this.getContext(), GATEWAY_ID,
                         endpoint -> endpoint.replaceFromWith(GATEWAY_ENDPOINT_URI + "Stub"));
                 from(GATEWAY_ENDPOINT_URI)
                         .id(GATEWAY_ID + "Mock")
@@ -146,10 +145,10 @@ class AppGatewayServiceImplTest {
 		});
         Mockito.when(mockRequest.getRequestURI()).thenReturn("/api/v1/app/mock/mock-request");
         try {
-        	this.appGatewayService.sendRequestToAppSource(mockRequest);
-        	Assertions.fail("Request should have thrown exception");
+        this.appGatewayService.sendRequestToAppSource(mockRequest);
+        Assertions.fail("Request should have thrown exception");
         } catch (ResponseStatusException ex) {
-        	assertThat(ex.getStatus()).isEqualTo(HttpStatus.SERVICE_UNAVAILABLE);
+        assertThat(ex.getStatusCode()).isEqualTo(HttpStatus.SERVICE_UNAVAILABLE);
         }
     }
 

@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import java.util.*;
 
 public interface DocumentSpaceFileSystemEntryRepository extends JpaRepository<DocumentSpaceFileSystemEntry, UUID> {
@@ -34,6 +34,10 @@ public interface DocumentSpaceFileSystemEntryRepository extends JpaRepository<Do
     @Modifying
     @Transactional
     void deleteByDocumentSpaceIdEqualsAndItemIdEquals(UUID spaceId, UUID itemId);
+
+    @Modifying
+    @Transactional
+    void deleteByDocumentSpaceIdEquals(UUID spaceId);
 
     /*
      * Folder methods

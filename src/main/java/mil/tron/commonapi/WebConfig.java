@@ -8,9 +8,10 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.security.web.firewall.RequestRejectedHandler;
 import org.springframework.security.web.firewall.StrictHttpFirewall;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 
 @Configuration
@@ -28,6 +29,11 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addMapping("/**").allowedOriginPatterns("*").allowedHeaders("*")
                 .allowedMethods(allowedMethods).allowCredentials(true);
 
+    }
+
+    @Override
+    public void configurePathMatch(PathMatchConfigurer configurer) {
+        configurer.setUseTrailingSlashMatch(true);
     }
 
 

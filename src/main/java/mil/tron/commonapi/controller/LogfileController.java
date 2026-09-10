@@ -1,6 +1,6 @@
 package mil.tron.commonapi.controller;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
@@ -43,7 +43,7 @@ public class LogfileController {
 				content = @Content(schema = @Schema(implementation = ExceptionResponse.class)))
 	})
 	@PreAuthorizeDashboardAdmin
-	@GetMapping
+	@GetMapping({"", "/"})
 	public ResponseEntity<Object> getLogfileInfo() {
 		return new ResponseEntity<>(service.getAllLogfileInfo(), HttpStatus.OK);
 	}

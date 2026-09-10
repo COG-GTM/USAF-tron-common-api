@@ -10,8 +10,8 @@ import mil.tron.commonapi.repository.HttpLogsRepository;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.modelmapper.ModelMapper;
-import org.springframework.boot.actuate.trace.http.HttpTrace;
-import org.springframework.boot.actuate.trace.http.HttpTraceRepository;
+import org.springframework.boot.actuate.web.exchanges.HttpExchange;
+import org.springframework.boot.actuate.web.exchanges.HttpExchangeRepository;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -31,7 +31,7 @@ import java.util.*;
 @Service
 @Profile("production | development | staging | local")
 @Order(Ordered.HIGHEST_PRECEDENCE)
-public class HttpTraceService implements HttpTraceRepository {
+public class HttpTraceService implements HttpExchangeRepository {
     private final Log traceLogger = LogFactory.getLog(CommonApiLogger.class);
     private ModelMapper modelMapper = new ModelMapper();
     private final Object lockObj = new Object();
@@ -92,7 +92,7 @@ public class HttpTraceService implements HttpTraceRepository {
     }
 
     @Override
-    public List<HttpTrace> findAll() {
+    public List<HttpExchange> findAll() {
         return new ArrayList<>();
     }
 
@@ -104,13 +104,13 @@ public class HttpTraceService implements HttpTraceRepository {
      * @param trace the injected HTTP trace
      */
     @Override
-    public void add(HttpTrace trace) {
+    public void add(HttpExchange trace) {
         synchronized (lockObj) {
             ContentTrace contentTrace = contentTraceManager.getTrace();
 
             // get the principal - which may be null
             String user = "Unknown";
-            HttpTrace.Principal principal = trace.getPrincipal();
+            HttpExchange.Principal principal = trace.getPrincipal();
             if (principal != null) {
                 user = principal.getName();
             }
@@ -124,11 +124,16 @@ public class HttpTraceService implements HttpTraceRepository {
 
             sanitizeBodies(trace, contentTrace);
 
+            String responseBody = contentTrace.getResponseBody();
+            String errorMessage = contentTrace.getErrorMessage();
+            if (responseBody == null && "Access Denied".equals(errorMessage)) {
+                errorMessage = "Access is denied";
+            }
             httpLogsRepository.save(
                     HttpLogEntry
                             .builder()
                             .userName(user)
-                            .timeTakenMs(trace.getTimeTaken())
+                            .timeTakenMs(trace.getTimeTaken() == null ? null : trace.getTimeTaken().toMillis())
                             .queryString(trace.getRequest().getUri().getQuery())
                             .userAgent(userAgent)
                             .remoteIp(trace.getRequest().getRemoteAddress())
@@ -137,7 +142,7 @@ public class HttpTraceService implements HttpTraceRepository {
                             .requestedUrl(trace.getRequest().getUri().toString())
                             .requestHost(trace.getRequest().getUri().getHost())
                             .requestBody(contentTrace.getRequestBody())
-                            .responseBody(contentTrace.getResponseBody() != null ? contentTrace.getResponseBody() : contentTrace.getErrorMessage())
+                            .responseBody(responseBody != null ? responseBody : errorMessage)
                             .statusCode(trace.getResponse().getStatus())
                             .build());
         }
@@ -148,7 +153,7 @@ public class HttpTraceService implements HttpTraceRepository {
      * @param trace the http trace
      * @param contentTrace the current content trace
      */
-    public void sanitizeBodies(HttpTrace trace, ContentTrace contentTrace) {
+    public void sanitizeBodies(HttpExchange trace, ContentTrace contentTrace) {
 
         if (trace.getRequest().getUri().toString() != null
                 && contentTrace != null) {
@@ -194,4 +199,3 @@ public class HttpTraceService implements HttpTraceRepository {
         return content;
     }
 }
-

@@ -4,7 +4,7 @@ import lombok.*;
 
 import java.util.List;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * Used for path related entries

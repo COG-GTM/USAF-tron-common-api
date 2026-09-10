@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 
 import mil.tron.commonapi.entity.DashboardUser;
 import mil.tron.commonapi.repository.DashboardUserRepository;

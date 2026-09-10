@@ -19,7 +19,7 @@ import mil.tron.commonapi.repository.AppClientUserRespository;
 import mil.tron.commonapi.repository.PrivilegeRepository;
 import mil.tron.commonapi.repository.documentspace.DocumentSpacePrivilegeRepository;
 import mil.tron.commonapi.service.DashboardUserService;
-import org.assertj.core.util.Lists;
+import com.google.common.collect.Lists;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -82,10 +82,12 @@ public class DocumentSpacePrivilegeServiceImpl implements DocumentSpacePrivilege
 			DocumentSpacePrivilege privilege = buildDocumentSpacePrivilege(createPrivilegeName(documentSpace.getId(), currentType), currentType);
 			
 			privilegesToAdd.add(privilege);
-			documentSpace.addPrivilege(privilege);
 		}
 		
-		documentSpacePrivilegeRepository.saveAll(privilegesToAdd);
+		List<DocumentSpacePrivilege> savedPrivileges = new ArrayList<>();
+		documentSpacePrivilegeRepository.saveAll(privilegesToAdd).forEach(savedPrivileges::add);
+		documentSpace.getPrivileges().clear();
+		savedPrivileges.forEach(documentSpace::addPrivilege);
 	}
 
 	@Override

@@ -3,7 +3,7 @@ package mil.tron.commonapi.dto.metrics;
 import lombok.*;
 import mil.tron.commonapi.dto.appsource.EndpointDto;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;

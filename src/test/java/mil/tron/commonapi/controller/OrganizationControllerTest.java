@@ -20,7 +20,7 @@ import mil.tron.commonapi.repository.filter.QueryOperator;
 import mil.tron.commonapi.repository.filter.RelationType;
 import mil.tron.commonapi.service.AppClientUserPreAuthenticatedService;
 import mil.tron.commonapi.service.OrganizationService;
-import org.assertj.core.util.Lists;
+import com.google.common.collect.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

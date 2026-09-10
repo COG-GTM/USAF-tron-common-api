@@ -2,7 +2,7 @@ package mil.tron.commonapi.entity.appsource;
 
 import lombok.*;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 import org.springframework.web.bind.annotation.RequestMethod;
 

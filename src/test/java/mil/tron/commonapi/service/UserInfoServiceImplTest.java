@@ -21,7 +21,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import mil.tron.commonapi.dto.UserInfoDto;
 import mil.tron.commonapi.exception.BadRequestException;
 
-import javax.persistence.EntityNotFoundException;
+import jakarta.persistence.EntityNotFoundException;
 import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
