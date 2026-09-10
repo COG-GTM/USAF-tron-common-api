@@ -2,7 +2,7 @@ package mil.tron.commonapi.service.utility;
 
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 public class ResolvePathFromRequest {
     private ResolvePathFromRequest() {}

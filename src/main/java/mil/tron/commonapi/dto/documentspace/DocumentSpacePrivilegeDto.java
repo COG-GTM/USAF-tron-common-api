@@ -2,7 +2,7 @@ package mil.tron.commonapi.dto.documentspace;
 
 import java.util.UUID;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

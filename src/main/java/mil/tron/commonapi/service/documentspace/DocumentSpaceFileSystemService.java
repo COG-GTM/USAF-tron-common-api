@@ -40,6 +40,7 @@ public interface DocumentSpaceFileSystemService {
     void archiveElement(UUID spaceId, String path, String itemName);
     void unArchiveElements(UUID spaceId, List<String> items);
     void deleteFolder(UUID spaceId, String path);
+    void deleteAllEntries(UUID spaceId);
     void renameFolder(UUID spaceId, String existingPath, String newFolderName);
     void saveItem(DocumentSpaceFileSystemEntry entry);
     void moveFileSystemEntryTree(UUID destinationSpaceId, DocumentSpaceFileSystemEntry startingEntry, UUID newParentId);

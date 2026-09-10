@@ -54,7 +54,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -119,12 +119,12 @@ public class OrganizationServiceImpl implements OrganizationService {
 	}
 
 	// helper that applies entity field authorization for us
-	private EntityFieldAuthResponse<Organization> applyFieldAuthority(Organization incomingEntity) {
+	EntityFieldAuthResponse<Organization> applyFieldAuthority(Organization incomingEntity) {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		return entityFieldAuthService.adjudicateOrganizationFields(incomingEntity, authentication);
 	}
 	
-	private boolean isUserAuthorizedForFieldEdit(String fieldName) {
+	boolean isUserAuthorizedForFieldEdit(String fieldName) {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		return entityFieldAuthService.userHasAuthorizationToField(authentication, EntityFieldAuthType.ORGANIZATION, fieldName);
 	}
@@ -435,6 +435,9 @@ public class OrganizationServiceImpl implements OrganizationService {
 		performParentChecks(efaResponse.getModifiedEntity());
 		
 		Organization result = repository.save(efaResponse.getModifiedEntity());
+		if (!efaResponse.getModifiedEntity().getMetadata().isEmpty()) {
+			result = repository.findById(result.getId()).orElse(result);
+		}
 
 		OrganizationChangedMessage message = new OrganizationChangedMessage();
 		message.addOrgId(id);
@@ -508,11 +511,13 @@ public class OrganizationServiceImpl implements OrganizationService {
 		Organization resultEntity = repository.save(org);
 		OrganizationDto result = convertToDto(resultEntity);
 		if (organization.getMeta() != null) {
+			Set<OrganizationMetadata> savedMetadata = new HashSet<>();
 			organization.getMeta().forEach((key, value) -> {
-				resultEntity.getMetadata().add(new OrganizationMetadata(result.getId(), key, value));
+				savedMetadata.add(organizationMetadataRepository.save(
+						new OrganizationMetadata(result.getId(), key, value)));
 				result.setMetaProperty(key, value);
 			});
-			organizationMetadataRepository.saveAll(resultEntity.getMetadata());
+			resultEntity.getMetadata().addAll(savedMetadata);
 		}
 
 		return result;
@@ -569,6 +574,9 @@ public class OrganizationServiceImpl implements OrganizationService {
 		performParentChecks(efaResponse.getModifiedEntity());
 		
 		Organization result = repository.save(efaResponse.getModifiedEntity());
+		if (!efaResponse.getModifiedEntity().getMetadata().isEmpty()) {
+			result = repository.findById(result.getId()).orElse(result);
+		}
 		
 		OrganizationChangedMessage message = new OrganizationChangedMessage();
 		message.setOrgIds(Sets.newHashSet(result.getId()));
@@ -600,7 +608,10 @@ public class OrganizationServiceImpl implements OrganizationService {
 		
 		// Metadata is null, so add everything to delete
 		if (metadata == null) {
-			dbEntity.ifPresent(entity -> toDelete.addAll(entity.getMetadata()));
+			dbEntity.ifPresent(entity -> {
+				toDelete.addAll(entity.getMetadata());
+				entity.getMetadata().clear();
+			});
 		} else {
 			if (dbEntity.isEmpty()) {
 				metadata.forEach((key, value) -> {
@@ -638,12 +649,13 @@ public class OrganizationServiceImpl implements OrganizationService {
 		// Only send these changes to the database if the requesting
 		// user is allowed to edit. Otherwise metadata changes updated
 		// on updatedEntity are only appended to reflect a change.
+		List<OrganizationMetadata> savedMetadata = toSave;
 		if (allowedToEdit) {
 			organizationMetadataRepository.deleteAll(toDelete);
-			organizationMetadataRepository.saveAll(toSave);
+			savedMetadata = new ArrayList<>();
+			organizationMetadataRepository.saveAll(toSave).forEach(savedMetadata::add);
+			updatedEntity.getMetadata().addAll(savedMetadata);
 		}
-		
-		updatedEntity.getMetadata().addAll(toSave);
 		
 		return updatedEntity;
 	}

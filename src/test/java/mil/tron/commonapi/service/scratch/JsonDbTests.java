@@ -12,7 +12,7 @@ import mil.tron.commonapi.exception.InvalidFieldValueException;
 import mil.tron.commonapi.exception.RecordNotFoundException;
 import mil.tron.commonapi.exception.scratch.InvalidJsonPathQueryException;
 import mil.tron.commonapi.repository.scratch.ScratchStorageRepository;
-import org.assertj.core.util.Sets;
+import com.google.common.collect.Sets;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -79,7 +79,7 @@ public class JsonDbTests {
                 .builder()
                 .id(UUID.randomUUID())
                 .appName("Area51")
-                .userPrivs(Sets.newLinkedHashSet(
+                .userPrivs(new LinkedHashSet<>(Set.of(
                         ScratchStorageAppUserPriv
                                 .builder()
                                 .user(user1)
@@ -90,7 +90,7 @@ public class JsonDbTests {
                                 .user(user1)
                                 .privilege(privWrite)
                                 .build()
-                ))
+                )))
                 .build());
 
         registeredApps.add(ScratchStorageAppRegistryEntry

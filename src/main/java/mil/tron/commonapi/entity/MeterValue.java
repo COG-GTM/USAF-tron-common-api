@@ -4,8 +4,8 @@ import lombok.*;
 import mil.tron.commonapi.entity.appsource.AppEndpoint;
 import mil.tron.commonapi.entity.appsource.AppSource;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import java.util.Date;
 import java.util.UUID;
 

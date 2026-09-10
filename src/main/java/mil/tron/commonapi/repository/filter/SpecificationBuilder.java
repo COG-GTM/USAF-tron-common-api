@@ -6,12 +6,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import javax.persistence.criteria.Expression;
-import javax.persistence.criteria.Join;
-import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Root;
+import jakarta.persistence.criteria.Expression;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.Path;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.metamodel.Attribute;
+import jakarta.persistence.metamodel.ManagedType;
 
-import org.hibernate.query.criteria.internal.BasicPathUsageException;
 import org.springframework.data.jpa.domain.Specification;
 
 import mil.tron.commonapi.exception.BadRequestException;
@@ -80,7 +81,7 @@ public class SpecificationBuilder {
 	
 					checkOperatorSupportsInput(input.getOperator(), dbPathObj.getJavaType(), field);
 	
-					if (dbPathObj.getJavaType().equals(Date.class)) {
+					if (Date.class.isAssignableFrom(dbPathObj.getJavaType())) {
 						Expression<Date> dbPathObjAsDate = dbPathObj.as(Date.class);
 						return criteriaBuilder.greaterThan(dbPathObjAsDate,
 								(Date) castToRequiredType(dbPathObj.getJavaType(), field, input.getValue()));
@@ -98,7 +99,7 @@ public class SpecificationBuilder {
 	
 					checkOperatorSupportsInput(input.getOperator(), dbPathObj.getJavaType(), field);
 					
-					if (dbPathObj.getJavaType().equals(Date.class)) {
+					if (Date.class.isAssignableFrom(dbPathObj.getJavaType())) {
 						Expression<Date> dbPathObjAsDate = dbPathObj.as(Date.class);
 						return criteriaBuilder.lessThan(dbPathObjAsDate,
 								(Date) castToRequiredType(dbPathObj.getJavaType(), field, input.getValue()));
@@ -202,7 +203,7 @@ public class SpecificationBuilder {
 				}
 				
 				return joinedEntity.join(joinAttribute).get(field);
-			} catch (IllegalArgumentException | BasicPathUsageException ex) {
+			} catch (IllegalArgumentException ex) {
 				throw new BadRequestException(
 						String.format("Field [%s] with Join Attribute [%s] does not exist or is invalid", field, joinAttribute));
 			}
@@ -231,6 +232,15 @@ public class SpecificationBuilder {
 		// Only join up to but not including the last element.
 		for (int i = 0; i < pathToField.length - 1; i++) {
 			try {
+				Object modelObject = joinedEntity == null ? root.getModel() : joinedEntity.getModel();
+				if (!(modelObject instanceof ManagedType<?> model)) {
+					throw new IllegalArgumentException("Attribute is not joinable");
+				}
+				Attribute<?, ?> attribute = model.getAttribute(pathToField[i]);
+				if (attribute.getPersistentAttributeType() == Attribute.PersistentAttributeType.BASIC
+						|| attribute.getPersistentAttributeType() == Attribute.PersistentAttributeType.EMBEDDED) {
+					throw new IllegalArgumentException("Attribute is not joinable");
+				}
 				if (joinedEntity == null) {
 					joinedEntity = root.join(pathToField[i]);
 				} else {
@@ -238,12 +248,11 @@ public class SpecificationBuilder {
 				}
 			} catch (IllegalArgumentException ex) {
 				throw new BadRequestException(
-						String.format("Field Path [%s] failed at [position: %d, value: %s]: path does not exist", 
-								String.join(",", pathToField), i, pathToField[i]));
-			} catch (BasicPathUsageException ex) {
-				throw new BadRequestException(
-						String.format("Field Path [%s] failed at [position: %d, value: %s]: nested property is invalid", 
-								String.join(",", pathToField), i, pathToField[i]));
+						i > 0
+								? String.format("Field Path [%s] failed at [position: %d, value: %s]: nested property is invalid",
+										String.join(",", pathToField), i, pathToField[i])
+								: String.format("Field Path [%s] failed at [position: %d, value: %s]: path does not exist",
+										String.join(",", pathToField), i, pathToField[i]));
 			}
 		}
 		
@@ -312,7 +321,7 @@ public class SpecificationBuilder {
 				return Integer.valueOf(value);
 			}
 			
-			if (fieldType.isAssignableFrom(long.class)) {
+			if (fieldType.equals(Long.class) || fieldType.equals(long.class)) {
 				return Long.valueOf(value);
 			}
 			
@@ -324,7 +333,7 @@ public class SpecificationBuilder {
 				return UUID.fromString(value);
 			}
 			
-			if (fieldType.isAssignableFrom(Date.class)) {
+			if (Date.class.isAssignableFrom(fieldType)) {
 				ZonedDateTime date = ZonedDateTime.parse(value);
 				return Date.from(date.toInstant());
 			}

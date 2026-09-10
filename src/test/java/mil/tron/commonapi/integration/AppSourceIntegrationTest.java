@@ -58,7 +58,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;

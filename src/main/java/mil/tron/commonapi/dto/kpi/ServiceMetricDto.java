@@ -1,6 +1,6 @@
 package mil.tron.commonapi.dto.kpi;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -3,7 +3,7 @@ package mil.tron.commonapi.service.trace;
 import mil.tron.commonapi.entity.HttpLogEntry;
 import mil.tron.commonapi.exception.RecordNotFoundException;
 import mil.tron.commonapi.repository.HttpLogsRepository;
-import org.assertj.core.util.Lists;
+import com.google.common.collect.Lists;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

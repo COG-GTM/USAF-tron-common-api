@@ -1,5 +1,5 @@
 # Used for the docker-compose fullstack setup
-FROM registry.il2.dso.mil/platform-one/devops/pipeline-templates/ironbank/maven-jdk11:3.6.3
+FROM registry.il2.dso.mil/platform-one/devops/pipeline-templates/ironbank/maven-jdk21:3.9.9
 ENV CONTEXTS DEV
 USER root
 RUN rm -rf src

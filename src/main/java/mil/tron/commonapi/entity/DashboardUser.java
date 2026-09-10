@@ -5,8 +5,8 @@ import lombok.*;
 import mil.tron.commonapi.entity.documentspace.DocumentSpace;
 import mil.tron.commonapi.entity.documentspace.DocumentSpacePrivilege;
 
-import javax.persistence.*;
-import javax.validation.constraints.Email;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -45,7 +45,7 @@ public class DashboardUser {
     @Getter
     @Setter
     @Builder.Default
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
     		joinColumns=@JoinColumn(referencedColumnName="id"),
     		inverseJoinColumns=@JoinColumn(referencedColumnName="id")

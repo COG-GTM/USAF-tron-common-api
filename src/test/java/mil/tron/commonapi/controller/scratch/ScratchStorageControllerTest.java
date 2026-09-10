@@ -9,7 +9,7 @@ import mil.tron.commonapi.entity.scratch.ScratchStorageEntry;
 import mil.tron.commonapi.entity.scratch.ScratchStorageUser;
 import mil.tron.commonapi.service.PrivilegeService;
 import mil.tron.commonapi.service.scratch.ScratchStorageService;
-import org.assertj.core.util.Lists;
+import com.google.common.collect.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;

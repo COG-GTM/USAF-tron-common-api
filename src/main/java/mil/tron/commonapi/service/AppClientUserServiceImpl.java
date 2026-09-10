@@ -24,8 +24,8 @@ import mil.tron.commonapi.repository.appsource.AppSourceRepository;
 import mil.tron.commonapi.repository.pubsub.log.EventRequestLogRepository;
 import mil.tron.commonapi.service.pubsub.SubscriberService;
 import mil.tron.commonapi.service.pubsub.SubscriberServiceImpl;
-import org.assertj.core.util.Lists;
-import org.assertj.core.util.Sets;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.spi.MappingContext;
@@ -37,7 +37,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 
 import static mil.tron.commonapi.service.DashboardUserServiceImpl.DASHBOARD_USER_PRIV;
 
@@ -346,13 +346,12 @@ public class AppClientUserServiceImpl implements AppClientUserService {
 
 		Optional<DashboardUser> user = dashboardUserRepository.findByEmailIgnoreCase(email);
 		if (user.isEmpty()) {
-			return dashboardUserService.convertToEntity(dashboardUserService
-					.createDashboardUserDto(DashboardUserDto
-							.builder()
-							.id(UUID.randomUUID())
-							.email(email)
-							.privileges(Lists.newArrayList(mapper.map(appClientPriv, PrivilegeDto.class)))
-							.build()));
+			return dashboardUserService.createDashboardUser(DashboardUserDto
+					.builder()
+					.id(UUID.randomUUID())
+					.email(email)
+					.privileges(Lists.newArrayList(mapper.map(appClientPriv, PrivilegeDto.class)))
+					.build());
 		}
 		else {
 			DashboardUser existingUser = user.get();

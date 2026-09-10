@@ -23,7 +23,7 @@ import mil.tron.commonapi.repository.scratch.ScratchStorageAppUserPrivRepository
 import mil.tron.commonapi.repository.scratch.ScratchStorageRepository;
 import mil.tron.commonapi.repository.scratch.ScratchStorageUserRepository;
 import mil.tron.commonapi.service.PersonConversionOptions;
-import org.assertj.core.util.Sets;
+import com.google.common.collect.Sets;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -110,7 +110,7 @@ public class ScratchStorageServiceImplTest {
                 .builder()
                 .id(UUID.randomUUID())
                 .appName("Area51")
-                .userPrivs(Sets.newLinkedHashSet(
+                .userPrivs(new LinkedHashSet<>(Set.of(
                         ScratchStorageAppUserPriv
                             .builder()
                             .user(user1)
@@ -121,7 +121,7 @@ public class ScratchStorageServiceImplTest {
                             .user(user1)
                             .privilege(privWrite)
                             .build()
-                ))
+                )))
                 .build());
 
         registeredApps.add(ScratchStorageAppRegistryEntry

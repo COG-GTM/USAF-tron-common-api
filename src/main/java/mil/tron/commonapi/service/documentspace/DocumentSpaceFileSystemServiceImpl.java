@@ -465,6 +465,11 @@ public class DocumentSpaceFileSystemServiceImpl implements DocumentSpaceFileSyst
         propagateModificationStateToAncestors(tree.getValue());
     }
 
+    @Override
+    public void deleteAllEntries(UUID spaceId) {
+        repository.deleteByDocumentSpaceIdEquals(spaceId);
+    }
+
     /**
      * Private helper for the deleteFolder method to dig in depth first to a file structure and delete
      * the files and folders on the way up

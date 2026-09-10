@@ -27,7 +27,7 @@ import mil.tron.commonapi.service.utility.OrganizationUniqueChecksServiceImpl;
 import mil.tron.commonapi.service.utility.ValidatorService;
 
 import org.aspectj.weaver.ast.Or;
-import org.assertj.core.util.Lists;
+import com.google.common.collect.Lists;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -35,15 +35,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -61,8 +57,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(OrganizationServiceImpl.class)
 class OrganizationServiceImplTest {
 
 	@Mock
@@ -615,13 +609,12 @@ class OrganizationServiceImplTest {
 
 	@Test
 	void removeParentOrganization() throws Exception {
-		OrganizationService mockOrgService = PowerMockito.spy(organizationService);
-		PowerMockito.when(mockOrgService,
-				"isUserAuthorizedForFieldEdit", Organization.PARENT_ORG_FIELD).thenReturn(true);
+		OrganizationServiceImpl mockOrgService = Mockito.spy(organizationService);
+		Mockito.doReturn(true).when(mockOrgService)
+				.isUserAuthorizedForFieldEdit(Organization.PARENT_ORG_FIELD);
 		Mockito.when(repository.findById(testOrg.getId())).thenReturn(Optional.of(testOrg));
-		PowerMockito
-				.when(mockOrgService, "applyFieldAuthority", testOrg)
-				.thenReturn(new EntityFieldAuthResponse<Organization>(testOrg, new ArrayList<String>()));
+		Mockito.doReturn(new EntityFieldAuthResponse<Organization>(testOrg, new ArrayList<String>()))
+				.when(mockOrgService).applyFieldAuthority(testOrg);
 		Mockito.when(repository.save(testOrg)).thenReturn(testOrg);
 
 		mockOrgService.removeParentOrganization(testOrg.getId());
@@ -1139,9 +1132,9 @@ class OrganizationServiceImplTest {
 		Mockito.when(repository.findById(mockOrg.getId())).thenReturn(Optional.of(mockOrg));
 		Mockito.when(repository.findById(mockParentOrg.getId())).thenReturn(Optional.of(mockParentOrg));
 		Mockito.when(repository.save(any())).thenReturn(mockOrg);
-		OrganizationServiceImpl orgServiceImplSpy = PowerMockito.spy(organizationService);
-		PowerMockito.when(orgServiceImplSpy, "applyFieldAuthority", mockOrg)
-				.thenReturn(new EntityFieldAuthResponse<>(mockOrg, List.of()));
+		OrganizationServiceImpl orgServiceImplSpy = Mockito.spy(organizationService);
+		Mockito.doReturn(new EntityFieldAuthResponse<>(mockOrg, List.of()))
+				.when(orgServiceImplSpy).applyFieldAuthority(mockOrg);
 		assertThat(orgServiceImplSpy.modify(mockOrg.getId(), attribMap))
 				.isNotNull();
 	}

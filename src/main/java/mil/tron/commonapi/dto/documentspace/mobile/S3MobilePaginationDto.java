@@ -3,7 +3,7 @@ package mil.tron.commonapi.dto.documentspace.mobile;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
 @AllArgsConstructor

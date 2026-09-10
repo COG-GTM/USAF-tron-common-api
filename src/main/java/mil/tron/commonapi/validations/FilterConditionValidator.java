@@ -2,8 +2,8 @@ package mil.tron.commonapi.validations;
 
 import java.util.List;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 import mil.tron.commonapi.repository.filter.FilterCondition;
 import mil.tron.commonapi.repository.filter.QueryOperator;

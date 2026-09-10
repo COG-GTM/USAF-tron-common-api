@@ -7,8 +7,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
-import org.springframework.security.config.annotation.method.configuration.GlobalMethodSecurityConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 
 import mil.tron.commonapi.ApplicationProperties;
 import mil.tron.commonapi.repository.appsource.AppSourceRepository;
@@ -17,8 +16,8 @@ import mil.tron.commonapi.service.documentspace.DocumentSpacePrivilegeService;
 
 @Configuration
 @ConditionalOnProperty(name = "security.enabled", havingValue="true")
-@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true, order = 1)
-public class MethodSecurityConfig extends GlobalMethodSecurityConfiguration {
+@EnableMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
+public class MethodSecurityConfig {
     @Bean
     public AccessCheck accessCheck(ApplicationProperties versionProperties, AppClientUserService appClientUserService) {
         return new AccessCheckImpl(versionProperties, appClientUserService);

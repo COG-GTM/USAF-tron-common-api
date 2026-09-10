@@ -3,8 +3,8 @@ package mil.tron.commonapi.dto.documentspace.mobile;
 
 import lombok.*;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.UUID;
 

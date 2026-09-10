@@ -1,6 +1,6 @@
 package mil.tron.commonapi.security;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 public interface AccessCheck {
     /**
