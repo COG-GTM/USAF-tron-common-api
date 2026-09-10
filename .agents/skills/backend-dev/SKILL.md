@@ -4,6 +4,16 @@ Reference knowledge for working with TRON Common API.
 
 ## 1. Local Dev Loop
 
+### Supported stack
+- **Java**: 21
+- **Spring Boot**: 3.5.16
+- **H2**: 2.3.232
+- **Hibernate ORM**: 6.6.x
+- **Liquibase**: 4.31.1
+- **Spring Security**: 6.5.x
+- **SpringDoc OpenAPI**: 2.8.17
+- **Apache Camel**: 4.14.9
+
 ### Clone & Build
 ```bash
 git clone <repo-url>

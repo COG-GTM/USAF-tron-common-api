@@ -6,17 +6,17 @@ TRON Common API is a centralized RESTful backend service for the airmencoders ec
 
 ## Tech stack
 
-- **Spring Boot**: 2.5.12
-- **Java**: 11
+- **Spring Boot**: 3.5.16
+- **Java**: 21
 - **PostgreSQL**: Runtime dependency (production database)
-- **H2 Database**: 1.4.200 (in-memory, for development/testing)
-- **Hibernate ORM**: 5.4.32.Final
-- **Liquibase**: 4.3.1 (database migrations)
-- **Spring Security**: 5.5.4
-- **SpringDoc OpenAPI**: 1.5.0 (Swagger UI)
+- **H2 Database**: 2.3.232 (in-memory, for development/testing)
+- **Hibernate ORM**: 6.6.x
+- **Liquibase**: 4.31.1 (database migrations)
+- **Spring Security**: 6.5.x
+- **SpringDoc OpenAPI**: 2.8.17 (Swagger UI)
 - **Jackson**: 2.13.2.1 (JSON processing)
 - **Lombok**: (compile-time code generation)
-- **Apache Camel**: 3.5.0 (integration/routing)
+- **Apache Camel**: 4.14.9 (integration/routing)
 - **AWS SDK S3**: 1.12.68
 - **ModelMapper**: 2.3.0 (entity-DTO mapping)
 - **Logback**: 1.2.10 / Log4j2: 2.17.1
@@ -149,12 +149,13 @@ mvn clean test
 
 ### Test frameworks used
 - **JUnit** - Test runner
-- **Mockito** / **Mockito Inline**: 3.9.0 - Mocking framework
-- **PowerMock**: 2.0.9 - Static/final method mocking
+- **Mockito**: 5.x - Mocking framework
 - **Spring Boot Test** - Integration testing support
 - **Spring Security Test** - Security context testing
 - **H2** - In-memory database for tests
 - **S3Mock**: 0.2.6 - S3 service mocking
+- **JaCoCo**: 0.8.13 - Code coverage
+- **Checkstyle**: 10.x - Static analysis
 
 ### Test types
 - Controller tests: `src/test/java/mil/tron/commonapi/controller/`

@@ -1,5 +1,5 @@
 # Load the hardened jdk image we use to run common
-FROM registry.il2.dso.mil/platform-one/devops/pipeline-templates/base-image/harden-openjdk11-jre:11.0.11
+FROM registry.il2.dso.mil/platform-one/devops/pipeline-templates/base-image/harden-openjdk21-jre:21
 
 ENV CONTEXTS DEV
 

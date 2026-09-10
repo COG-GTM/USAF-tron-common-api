@@ -20,6 +20,29 @@ If you want to run it locally in `production` profile, then issue `mvn spring-bo
 
 If you want to run properties specific to your local setup, create an `application-local.properties` file in the resources directory and override specific properties.
 
+## Java 11 → 21 migration
+
+This project now uses:
+
+- Java 21
+- Spring Boot 2.5.12 → 3.5.16
+- Spring Security 5.5 → 6.5, using `SecurityFilterChain`
+- `javax` → `jakarta`
+- Hibernate 5.4 → 6.6
+- H2 1.4 → 2.3, with `NON_KEYWORDS=KEY,VALUE`
+- Liquibase 4.3.1 → 4.31.1
+- Apache Camel 3.5 → 4.14.9
+- springdoc 1.5 → 2.8.17
+- Actuator `/actuator/httptrace` → `/actuator/httpexchanges`
+- PowerMock removed; Mockito 5 is used for mocking
+- JaCoCo 0.8.13
+- Checkstyle 10
+
+The two pre-existing baseline test failures remain known follow-ups:
+
+- `AppSourceIntegrationTest.testHealthChecks`
+- `DocumentSpaceFileSystemServiceTests.propagateModificationStateOnlyDoesOlderAncestors`
+
 ## Swagger Docs
 Navigate to the root of the API - `/api` and a redirect will go to the Swagger UI docs.
 
@@ -38,7 +61,7 @@ http://localhost:8088/api/h2-console/
 
 ### H2 Connection String
 
-jdbc:h2:mem:testdb
+jdbc:h2:mem:testdb;NON_KEYWORDS=KEY,VALUE
 
 ### H2 creds
 
