@@ -584,7 +584,7 @@ public class ScratchStorageServiceImpl implements ScratchStorageService {
 
             // if accessing an ACL and requester is not a KEY_ADMIN for it, then deny even reading it
             if (keyName.endsWith(ACL_LIST_NAME_APPENDIX)
-                    && !aclNodes.get(ACL_ACCESS_FIELD).get(email).textValue().equals("ADMIN")) {
+                    && !"ADMIN".equals(getAclRoleForEmail(aclNodes, email))) {
 
                 return false;
             }
@@ -662,26 +662,21 @@ public class ScratchStorageServiceImpl implements ScratchStorageService {
 
 
     private boolean validateAclAccessLevel(String email, String keyName, String desiredRole, JsonNode aclNodes) {
+        String role = getAclRoleForEmail(aclNodes, email);
         switch (desiredRole) {
             case READ:
                 if (aclNodes.get(ACL_IMPLICIT_READ_FIELD).booleanValue()) return true;
-                if (aclNodes.get(ACL_ACCESS_FIELD).has(email.toLowerCase())
-                        && (aclNodes.get(ACL_ACCESS_FIELD).get(email).textValue().equals(READ)
-                            || aclNodes.get(ACL_ACCESS_FIELD).get(email).textValue().equals(WRITE)
-                            || aclNodes.get(ACL_ACCESS_FIELD).get(email).textValue().equals(ADMIN))) {
+                if (READ.equals(role) || WRITE.equals(role) || ADMIN.equals(role)) {
                     return true;
                  }
                 break;
             case WRITE:
-                if (aclNodes.get(ACL_ACCESS_FIELD).has(email.toLowerCase())
-                        && (aclNodes.get(ACL_ACCESS_FIELD).get(email).textValue().equals(WRITE)
-                            || aclNodes.get(ACL_ACCESS_FIELD).get(email).textValue().equals(ADMIN))) {
+                if (WRITE.equals(role) || ADMIN.equals(role)) {
                     return true;
                 }
                 break;
             case ADMIN:
-                if (aclNodes.get(ACL_ACCESS_FIELD).has(email.toLowerCase())
-                        && aclNodes.get(ACL_ACCESS_FIELD).get(email).textValue().equals(ADMIN)) {
+                if (ADMIN.equals(role)) {
                     return true;
                 }
                 break;
@@ -689,6 +684,20 @@ public class ScratchStorageServiceImpl implements ScratchStorageService {
                 throw new InvalidFieldValueException(String.format("ACL %s_acl has unknown permission in it", keyName));
         }
         return false;
+    }
+
+    /**
+     * Resolves the role a given email has within an ACL's "access" object.  The email is
+     * normalized (lower cased) for the lookup, and non-existent/non-textual entries resolve
+     * to null so that callers deny access instead of throwing.
+     * @param aclNodes the parsed ACL json (already validated to have an "access" object)
+     * @param email the requester's email
+     * @return the role string for the email or null if the email has no textual role in the ACL
+     */
+    private String getAclRoleForEmail(JsonNode aclNodes, String email) {
+        if (email == null) return null;
+        JsonNode roleNode = aclNodes.get(ACL_ACCESS_FIELD).get(email.toLowerCase());
+        return roleNode != null && roleNode.isTextual() ? roleNode.textValue() : null;
     }
 
     /**
