@@ -1079,5 +1079,49 @@ public class ScratchStorageServiceImplTest {
         assertTrue(service.userCanReadFromAppId(testApp.getId(), "test@test.com", "users"));
     }
 
+    @Test
+    void testAclLookupDeniesUnlistedAndMalformedAclEntries() {
+
+        ScratchStorageAppRegistryEntry testApp = registeredApps.get(0);
+        testApp.setAclMode(true);
+
+        Mockito.when(appRegistryRepo.findById(Mockito.any())).thenReturn(Optional.of(testApp));
+        Mockito.when(repository.findByAppIdAndKey(testApp.getId(), "users_acl"))
+                .thenReturn(Optional.of(ScratchStorageEntry
+                        .builder()
+                        .key("users_acl")
+                        .value("{ \"implicitRead\" : false, \"access\" : { \"test@test.com\": \"KEY_WRITE\", \"bogus@test.com\": 42 } }")
+                        .build()));
+
+        // email not present in the acl gets a clean denial
+        assertFalse(service.userCanReadFromAppId(testApp.getId(), "nobody@test.com", "users"));
+        assertFalse(service.userCanWriteToAppId(testApp.getId(), "nobody@test.com", "users"));
+        assertFalse(service.userCanDeleteKeyForAppId(testApp.getId(), "nobody@test.com", "users"));
+
+        // non-textual role value gets a clean denial
+        assertFalse(service.userCanReadFromAppId(testApp.getId(), "bogus@test.com", "users"));
+
+        // acl keys are stored lower cased - requester's casing shouldn't matter
+        assertTrue(service.userCanWriteToAppId(testApp.getId(), "Test@Test.com", "users"));
+    }
+
+    @Test
+    void testAclLookupOnAclKeyDeniesUnlistedRequester() {
+
+        ScratchStorageAppRegistryEntry testApp = registeredApps.get(0);
+        testApp.setAclMode(true);
+
+        Mockito.when(appRegistryRepo.findById(Mockito.any())).thenReturn(Optional.of(testApp));
+        Mockito.when(repository.findByAppIdAndKey(testApp.getId(), "users_acl_acl"))
+                .thenReturn(Optional.of(ScratchStorageEntry
+                        .builder()
+                        .key("users_acl_acl")
+                        .value("{ \"implicitRead\" : true, \"access\" : { \"test@test.com\": \"KEY_ADMIN\" } }")
+                        .build()));
+
+        // requester absent from the acl's access object is denied instead of NPE-ing
+        assertFalse(service.userCanDeleteKeyForAppId(testApp.getId(), "nobody@test.com", "users_acl"));
+    }
+
 
 }
