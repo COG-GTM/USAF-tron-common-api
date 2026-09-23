@@ -2,6 +2,7 @@ package mil.tron.commonapi.service.puckboard;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.ImmutableList;
 import com.google.common.io.Resources;
 import mil.tron.commonapi.dto.OrganizationDto;
@@ -28,6 +29,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.AdditionalAnswers.returnsSecondArg;
 
@@ -115,6 +117,27 @@ public class PuckboardExtractorServiceImplTest {
 
         assertEquals(unitCount, result.get("orgs").size());
         assertEquals(peopleCount-1, result.get("people").size());
+    }
+
+    @Test
+    void testPersistOrgsAndMembersUnknownRankId() {
+
+        Mockito.when(personService.exists(Mockito.any(UUID.class))).thenReturn(false);
+        Mockito.when(personService.createPerson(Mockito.any(PersonDto.class))).then(returnsFirstArg());
+        Mockito.when(orgRepo.existsById(Mockito.any(UUID.class))).thenReturn(false);
+        Mockito.when(orgService.createOrganization(Mockito.any(OrganizationDto.class))).then(returnsFirstArg());
+        Mockito.when(orgService.getOrganization(Mockito.any())).thenReturn(new OrganizationDto());
+
+        // give the first person a rank id that the branch/rank payload doesn't know about
+        JsonNode firstPerson = peopleNodes.get("result").get(0);
+        ((ObjectNode) firstPerson).put("rankId", 9999);
+        UUID firstPersonId = UUID.fromString(firstPerson.get("id").textValue());
+
+        Map<String, Map<UUID, String>> result = puckboardExtractorService.persistOrgsAndMembers(orgNodes, peopleNodes, branchNodes);
+
+        // everyone else still gets imported, the unknown rank is recorded as a problem
+        assertEquals(peopleCount-1, result.get("people").size());
+        assertTrue(result.get("people").get(firstPersonId).contains("unknown rankId 9999"));
     }
 
     @Test

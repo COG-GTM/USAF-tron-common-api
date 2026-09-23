@@ -203,7 +203,20 @@ public class PuckboardExtractorServiceImpl implements PuckboardExtractorService 
             // skip placeholder people
             if (node.has(PLACEHOLDER_FIELD_NAME) && !node.get(PLACEHOLDER_FIELD_NAME).isNull() && node.get(PLACEHOLDER_FIELD_NAME).asBoolean()) continue;
 
-            PersonDto personDto = convertToPersonDto(node, rankLookup);
+            int rankId = node.path(PERSON_RANK_FIELD).asInt();
+            RankInfo rankInfo = rankLookup.get(rankId);
+            if (rankInfo == null) {
+                // the rank came from a different puckboard endpoint than this person, the two can drift -
+                //  record the person as a data problem instead of failing the whole import
+                personIdStatus.put(
+                        UUID.fromString(node.get(PERSON_ID_FIELD).textValue()),
+                        "Problem - " + node.path(PERSON_FIRST_NAME_FIELD).asText("")
+                                + " " + node.path(PERSON_LAST_NAME_FIELD).asText("")
+                                + " (unknown rankId " + rankId + ")");
+                continue;
+            }
+
+            PersonDto personDto = convertToPersonDto(node, rankInfo);
 
             try {
                 if (!personService.exists(personDto.getId())) {
@@ -223,8 +236,7 @@ public class PuckboardExtractorServiceImpl implements PuckboardExtractorService 
         return personIdStatus;
     }
 
-    private PersonDto convertToPersonDto(JsonNode node, Map<Integer, RankInfo> rankLookup) {
-        RankInfo rankInfo = rankLookup.get(node.get(PERSON_RANK_FIELD).asInt());
+    private PersonDto convertToPersonDto(JsonNode node, RankInfo rankInfo) {
         return PersonDto.builder()
                 .id(UUID.fromString(node.get(PERSON_ID_FIELD).textValue()))
                 .dodid(node.get(PERSON_DODID_FIELD).asText(null))
