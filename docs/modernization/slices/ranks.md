@@ -128,6 +128,45 @@ RankAuthorizationCharacterizationTest  Tests run: 13, Failures: 0, Errors: 0, Sk
                                        Total:     71 passing
 ```
 
+## Conversion and validation (JDK 21, Spring Boot 3.5.16)
+
+The Maven build compiles the whole service at one Java/Boot level, so the lift is whole-repository,
+applied as one-topic commits (build/toolchain, `javax`→`jakarta`, Spring Security 6, Actuator
+`httpexchanges`, Hibernate 6/H2 2.x, trailing-slash matching, Boot 3 library APIs, test APIs).
+The mechanics were reused from the closed whole-repository migration attempt (PR #4).
+
+Running the unchanged characterization suite against the converted tree surfaced two invariants
+that the framework itself no longer honours (both had been marked Medium above for that reason):
+
+| Invariant | Boot 2.5.12 body | Boot 3.5.16 body (before fix) | Resolution |
+|---|---|---|---|
+| E17 | `reason=Request method 'POST' not supported` | `reason=Method 'POST' is not supported.` | `TronCommonErrorAttributes` maps `HttpRequestMethodNotSupportedException` back to the Boot 2 wording |
+| E18 | `reason=No message available` | `reason=No static resource v1/rank/usaf/Capt/extra.` | `TronCommonErrorAttributes` maps `NoResourceFoundException` back to `No message available` |
+
+E16 (trailing slash) is kept by `WebConfig.configurePathMatch` (`setUseTrailingSlashMatch(true)`).
+
+One characterization file needed a version-neutral edit that touches no assertion:
+`RankEndpointCharacterizationTest` reads the random port through `@Value("${local.server.port}")`
+because `@LocalServerPort` moved packages between Boot 2.5 and Boot 3. The edited file was re-run
+against unmodified `master` on JDK 11 (71/71) before being run on the converted tree.
+
+```
+JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64 mvn -B test \
+  -Dtest='RankEndpointCharacterizationTest*,RankServiceCharacterizationTest*,RankAuthorizationCharacterizationTest*'
+
+RankEndpointCharacterizationTest       Tests run: 38, Failures: 0, Errors: 0, Skipped: 0
+RankServiceCharacterizationTest        Tests run: 20, Failures: 0, Errors: 0, Skipped: 0
+RankAuthorizationCharacterizationTest  Tests run: 13, Failures: 0, Errors: 0, Skipped: 0
+                                       Total:     71 passing (unchanged assertions)
+```
+
+Full suite as second oracle: `master` on JDK 11 — 949 run, 948 pass, 1 fail; converted tree on
+JDK 21 — the same 949 pre-existing tests, 948 pass, 1 fail (same test,
+`DocumentSpaceFileSystemServiceTests.propagateModificationStateOnlyDoesOlderAncestors`, a
+wall-clock-dependent assertion that fails on `master` before any change here), plus 71
+characterization tests and 4 new `TronCommonErrorAttributesTest` cases. No pre-existing test
+changed outcome.
+
 ## Out of scope
 
 `RankService.getRank(UUID)` is exercised only via `PersonService` and has no HTTP route; it is pinned

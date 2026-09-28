@@ -38,7 +38,7 @@ http://localhost:8088/api/h2-console/
 
 ### H2 Connection String
 
-jdbc:h2:mem:testdb
+jdbc:h2:mem:testdb;NON_KEYWORDS=KEY,VALUE
 
 ### H2 creds
 
