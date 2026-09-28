@@ -227,8 +227,7 @@ public class DocumentSpaceController {
 				description = "Not Found - space not found",
 				content = @Content(schema = @Schema(implementation = ExceptionResponse.class)))
 	})
-	@PreAuthorizeOnlySSO
-	@PreAuthorize("@accessCheckDocumentSpace.hasMembershipAccess(authentication, #id)")
+	@PreAuthorize("!hasAuthority('APP_CLIENT') and @accessCheckDocumentSpace.hasMembershipAccess(authentication, #id)")
 	@DeleteMapping("/spaces/{id}/users/dashboard")
     public ResponseEntity<Object> removeUserFromDocumentSpace(
     		@PathVariable UUID id,
@@ -1057,8 +1056,7 @@ public class DocumentSpaceController {
 					description = "Not Found - space not found",
 					content = @Content(schema = @Schema(implementation = ExceptionResponse.class)))
 	})
-	@PreAuthorizeOnlySSO
-	@PreAuthorize("@accessCheckDocumentSpace.hasMembershipAccess(authentication, #id)")
+	@PreAuthorize("!hasAuthority('APP_CLIENT') and @accessCheckDocumentSpace.hasMembershipAccess(authentication, #id)")
 	@DeleteMapping("/spaces/{id}/app-client")
 	public ResponseEntity<Object> removeAppClientFromDocumentSpace(
 			@PathVariable UUID id,
@@ -1080,8 +1078,7 @@ public class DocumentSpaceController {
 					content = @Content(schema = @Schema(implementation = ExceptionResponse.class)))
 	})
 	@WrappedEnvelopeResponse
-	@PreAuthorizeOnlySSO
-	@PreAuthorize("@accessCheckDocumentSpace.hasMembershipAccess(authentication, #id)")
+	@PreAuthorize("!hasAuthority('APP_CLIENT') and @accessCheckDocumentSpace.hasMembershipAccess(authentication, #id)")
 	@GetMapping("/spaces/{id}/app-clients")
 	public ResponseEntity<List<DocumentSpaceAppClientResponseDto>> getAppClientUsersForDocumentSpace(@PathVariable UUID id) {
 		return ResponseEntity.ok(documentSpaceService.getAppClientsForDocumentSpace(id));
@@ -1101,8 +1098,7 @@ public class DocumentSpaceController {
 					content = @Content(schema = @Schema(implementation = ExceptionResponse.class)))
 	})
 	@WrappedEnvelopeResponse
-	@PreAuthorizeOnlySSO
-	@PreAuthorize("@accessCheckDocumentSpace.hasMembershipAccess(authentication, #id)")
+	@PreAuthorize("!hasAuthority('APP_CLIENT') and @accessCheckDocumentSpace.hasMembershipAccess(authentication, #id)")
 	@GetMapping("/spaces/{id}/available-app-clients")
 	public ResponseEntity<List<AppClientSummaryDto>> getAppClientsForAssignmentToDocumentSpace(@PathVariable UUID id) {
 		return ResponseEntity.ok(documentSpaceService.getAppClientsForAssignmentToDocumentSpace(id));
