@@ -35,6 +35,10 @@ public interface DocumentSpaceFileSystemEntryRepository extends JpaRepository<Do
     @Transactional
     void deleteByDocumentSpaceIdEqualsAndItemIdEquals(UUID spaceId, UUID itemId);
 
+    @Modifying
+    @Transactional
+    void deleteByDocumentSpaceIdEquals(UUID spaceId);
+
     /*
      * Folder methods
      */

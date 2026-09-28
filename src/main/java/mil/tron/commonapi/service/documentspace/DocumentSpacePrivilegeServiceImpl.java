@@ -1,6 +1,6 @@
 package mil.tron.commonapi.service.documentspace;
 
-import com.google.common.collect.Sets;
+import org.assertj.core.util.Sets;
 import lombok.extern.slf4j.Slf4j;
 import mil.tron.commonapi.annotation.minio.IfMinioEnabledOnIL4OrDevLocal;
 import mil.tron.commonapi.dto.appclient.AppClientSummaryDto;
@@ -82,10 +82,12 @@ public class DocumentSpacePrivilegeServiceImpl implements DocumentSpacePrivilege
 			DocumentSpacePrivilege privilege = buildDocumentSpacePrivilege(createPrivilegeName(documentSpace.getId(), currentType), currentType);
 			
 			privilegesToAdd.add(privilege);
-			documentSpace.addPrivilege(privilege);
 		}
 		
-		documentSpacePrivilegeRepository.saveAll(privilegesToAdd);
+		List<DocumentSpacePrivilege> savedPrivileges = new ArrayList<>();
+		documentSpacePrivilegeRepository.saveAll(privilegesToAdd).forEach(savedPrivileges::add);
+		documentSpace.getPrivileges().clear();
+		savedPrivileges.forEach(documentSpace::addPrivilege);
 	}
 
 	@Override

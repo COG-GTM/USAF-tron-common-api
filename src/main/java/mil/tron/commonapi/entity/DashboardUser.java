@@ -45,7 +45,7 @@ public class DashboardUser {
     @Getter
     @Setter
     @Builder.Default
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
     		joinColumns=@JoinColumn(referencedColumnName="id"),
     		inverseJoinColumns=@JoinColumn(referencedColumnName="id")

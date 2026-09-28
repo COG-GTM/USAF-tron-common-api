@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
-import com.google.common.collect.Sets;
+import org.assertj.core.util.Sets;
 
 import mil.tron.commonapi.dto.PersonDto;
 import mil.tron.commonapi.dto.PlatformJwtDto;
@@ -123,11 +123,12 @@ public class PersonServiceImpl implements PersonService {
 		Person resultEntity = repository.save(entity);
 		PersonDto result = convertToDto(resultEntity, null);
 		if (dto.getMeta() != null) {
+			Set<PersonMetadata> savedMetadata = new HashSet<>();
 			dto.getMeta().forEach((key, value) -> {
-				resultEntity.getMetadata().add(new PersonMetadata(result.getId(), key, value));
+				savedMetadata.add(personMetadataRepository.save(new PersonMetadata(result.getId(), key, value)));
 				result.setMetaProperty(key, value);
 			});
-			personMetadataRepository.saveAll(resultEntity.getMetadata());
+			resultEntity.getMetadata().addAll(savedMetadata);
 		}
 
 		return result;

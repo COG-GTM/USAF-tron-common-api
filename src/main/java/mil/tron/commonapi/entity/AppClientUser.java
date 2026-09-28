@@ -46,7 +46,7 @@ public class AppClientUser extends App {
 	@Getter
 	@Setter
 	@Builder.Default
-	@ManyToMany
+	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	private Set<DashboardUser> appClientDevelopers = new HashSet<>();
 
 	@Getter

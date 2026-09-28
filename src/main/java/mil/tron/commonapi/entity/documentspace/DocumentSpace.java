@@ -38,14 +38,14 @@ public class DocumentSpace {
 	@Column(unique = true)
 	private String name;
 	
-	@OneToMany(mappedBy="documentSpace")
+	@OneToMany(mappedBy="documentSpace", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	@MapKeyEnumerated(EnumType.STRING)
 	@MapKey(name="type")
 	@Builder.Default
 	@EqualsAndHashCode.Exclude
 	private Map<DocumentSpacePrivilegeType, DocumentSpacePrivilege> privileges = new EnumMap<>(DocumentSpacePrivilegeType.class);
 	
-	@ManyToMany
+	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	@JoinTable(
 			name="document_space_dashboard_users",
     		joinColumns=@JoinColumn(name="document_space_id", referencedColumnName="id"),
@@ -93,6 +93,10 @@ public class DocumentSpace {
 
 	public boolean addFileSystemEntry(DocumentSpaceFileSystemEntry entry) {
 		return fileSystemEntries.add(entry);
+	}
+
+	public boolean removeFileSystemEntry(DocumentSpaceFileSystemEntry entry) {
+		return fileSystemEntries.remove(entry);
 	}
     
     public void addPrivilege(DocumentSpacePrivilege privilege) {

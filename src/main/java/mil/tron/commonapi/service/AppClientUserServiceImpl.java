@@ -346,13 +346,12 @@ public class AppClientUserServiceImpl implements AppClientUserService {
 
 		Optional<DashboardUser> user = dashboardUserRepository.findByEmailIgnoreCase(email);
 		if (user.isEmpty()) {
-			return dashboardUserService.convertToEntity(dashboardUserService
-					.createDashboardUserDto(DashboardUserDto
-							.builder()
-							.id(UUID.randomUUID())
-							.email(email)
-							.privileges(Lists.newArrayList(mapper.map(appClientPriv, PrivilegeDto.class)))
-							.build()));
+			return dashboardUserService.createDashboardUser(DashboardUserDto
+					.builder()
+					.id(UUID.randomUUID())
+					.email(email)
+					.privileges(Lists.newArrayList(mapper.map(appClientPriv, PrivilegeDto.class)))
+					.build());
 		}
 		else {
 			DashboardUser existingUser = user.get();
