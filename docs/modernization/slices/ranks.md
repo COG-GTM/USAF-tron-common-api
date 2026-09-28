@@ -140,8 +140,17 @@ that the framework itself no longer honours (both had been marked Medium above f
 
 | Invariant | Boot 2.5.12 body | Boot 3.5.16 body (before fix) | Resolution |
 |---|---|---|---|
-| E17 | `reason=Request method 'POST' not supported` | `reason=Method 'POST' is not supported.` | `TronCommonErrorAttributes` maps `HttpRequestMethodNotSupportedException` back to the Boot 2 wording |
-| E18 | `reason=No message available` | `reason=No static resource v1/rank/usaf/Capt/extra.` | `TronCommonErrorAttributes` maps `NoResourceFoundException` back to `No message available` |
+| E17 | `reason=Request method 'POST' not supported` | `reason=Method 'POST' is not supported.` | `LegacyErrorMessages` maps `HttpRequestMethodNotSupportedException` back to the Boot 2 wording |
+| E18 | `reason=No message available` | `reason=No static resource v1/rank/usaf/Capt/extra.` | `LegacyErrorMessages` maps `NoResourceFoundException` back to `No message available` |
+
+The existing suite (second oracle) surfaced one more framework wording change outside the ranks
+routes: Spring Security 6 raises `AuthorizationDeniedException("Access Denied")` for `@PreAuthorize`
+failures where Spring Security 5 said `Access is denied`. That text reaches the JSON `reason` and,
+through `TraceErrorAdvice`, the persisted `http_logs.response_body`
+(`HttpTraceIntegrationTest.testNewTraceIsAdded` asserts on it). `LegacyErrorMessages` maps it back
+as well, so that test also runs unchanged. All three mappings live in
+`src/main/java/mil/tron/commonapi/exception/custom/LegacyErrorMessages.java` and are unit-tested by
+`LegacyErrorMessagesTest` and `TronCommonErrorAttributesTest`.
 
 E16 (trailing slash) is kept by `WebConfig.configurePathMatch` (`setUseTrailingSlashMatch(true)`).
 
@@ -164,8 +173,8 @@ Full suite as second oracle: `master` on JDK 11 — 949 run, 948 pass, 1 fail; c
 JDK 21 — the same 949 pre-existing tests, 948 pass, 1 fail (same test,
 `DocumentSpaceFileSystemServiceTests.propagateModificationStateOnlyDoesOlderAncestors`, a
 wall-clock-dependent assertion that fails on `master` before any change here), plus 71
-characterization tests and 4 new `TronCommonErrorAttributesTest` cases. No pre-existing test
-changed outcome.
+characterization tests and 8 new unit tests for the wording shim (`TronCommonErrorAttributesTest`,
+`LegacyErrorMessagesTest`). No pre-existing test changed outcome.
 
 ## Out of scope
 
