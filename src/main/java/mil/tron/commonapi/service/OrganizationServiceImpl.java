@@ -591,7 +591,8 @@ public class OrganizationServiceImpl implements OrganizationService {
 	 * Metadata changes will only be applied to {@link #organizationMetadataRepository}
 	 * if {@code allowedToEdit} is equal to {@code true}.
 	 * 
-	 * This action will not modify {@code dbEntity} in any manner.
+	 * {@code dbEntity} is only touched to drop metadata rows that were actually deleted
+	 * from its loaded collection.
 	 * 
 	 * @param updatedEntity the modified entity
 	 * @param dbEntity the database value of {@code updatedEntity}
@@ -608,10 +609,7 @@ public class OrganizationServiceImpl implements OrganizationService {
 		
 		// Metadata is null, so add everything to delete
 		if (metadata == null) {
-			dbEntity.ifPresent(entity -> {
-				toDelete.addAll(entity.getMetadata());
-				entity.getMetadata().clear();
-			});
+			dbEntity.ifPresent(entity -> toDelete.addAll(entity.getMetadata()));
 		} else {
 			if (dbEntity.isEmpty()) {
 				metadata.forEach((key, value) -> {
@@ -649,12 +647,12 @@ public class OrganizationServiceImpl implements OrganizationService {
 		// Only send these changes to the database if the requesting
 		// user is allowed to edit. Otherwise metadata changes updated
 		// on updatedEntity are only appended to reflect a change.
-		List<OrganizationMetadata> savedMetadata = toSave;
 		if (allowedToEdit) {
 			organizationMetadataRepository.deleteAll(toDelete);
-			savedMetadata = new ArrayList<>();
-			organizationMetadataRepository.saveAll(toSave).forEach(savedMetadata::add);
-			updatedEntity.getMetadata().addAll(savedMetadata);
+			dbEntity.ifPresent(entity -> entity.getMetadata().removeAll(toDelete));
+			organizationMetadataRepository.saveAll(toSave).forEach(updatedEntity.getMetadata()::add);
+		} else {
+			updatedEntity.getMetadata().addAll(toSave);
 		}
 		
 		return updatedEntity;

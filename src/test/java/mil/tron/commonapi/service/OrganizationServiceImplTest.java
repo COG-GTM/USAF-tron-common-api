@@ -202,6 +202,44 @@ class OrganizationServiceImplTest {
 					organizationService.convertToDto(mockOrg));
 	    	assertThat(updatedOrganization.getName()).isEqualTo(testOrgDto.getName());
 		}
+
+		@Test
+		void omittedMetadataByCallerWithoutMetadataAuthorityLeavesExistingMetadataUntouched() {
+			OrganizationMetadata existing = new OrganizationMetadata(testOrg.getId(), "pas", "value");
+			testOrg.getMetadata().add(existing);
+			Mockito.when(repository.findById(testOrg.getId())).thenReturn(Optional.of(testOrg));
+			Mockito.when(uniqueService.orgNameIsUnique(any(Organization.class))).thenReturn(true);
+			Mockito.when(entityFieldAuthService.userHasAuthorizationToField(any(), any(), eq(Organization.METADATA_FIELD)))
+					.thenReturn(false);
+			Mockito.when(entityFieldAuthService.adjudicateOrganizationFields(any(), any()))
+					.thenReturn(EntityFieldAuthResponse.<Organization>builder().modifiedEntity(testOrg).build());
+			Mockito.when(repository.save(any(Organization.class))).then(returnsFirstArg());
+
+			OrganizationDto result = organizationService.updateOrganization(testOrg.getId(), testOrgDto);
+
+			assertThat(testOrg.getMetadata()).containsExactly(existing);
+			assertThat(result.getMeta()).containsEntry("pas", "value");
+			Mockito.verifyNoInteractions(organizationMetadataRepository);
+		}
+
+		@Test
+		void omittedMetadataByAuthorizedCallerDeletesRowsAndDropsThemFromTheLoadedEntity() {
+			OrganizationMetadata existing = new OrganizationMetadata(testOrg.getId(), "pas", "value");
+			testOrg.getMetadata().add(existing);
+			Mockito.when(repository.findById(testOrg.getId())).thenReturn(Optional.of(testOrg));
+			Mockito.when(uniqueService.orgNameIsUnique(any(Organization.class))).thenReturn(true);
+			Mockito.when(entityFieldAuthService.userHasAuthorizationToField(any(), any(), eq(Organization.METADATA_FIELD)))
+					.thenReturn(true);
+			Mockito.when(entityFieldAuthService.adjudicateOrganizationFields(any(), any()))
+					.thenAnswer(i -> EntityFieldAuthResponse.<Organization>builder().modifiedEntity(i.getArgument(0)).build());
+			Mockito.when(repository.save(any(Organization.class))).then(returnsFirstArg());
+
+			OrganizationDto result = organizationService.updateOrganization(testOrg.getId(), testOrgDto);
+
+			verify(organizationMetadataRepository).deleteAll(List.of(existing));
+			assertThat(testOrg.getMetadata()).isEmpty();
+			assertThat(result.getMeta()).isNull();
+		}
 		
 		@Test
 		void jsonPatch_shouldFail_whenModifyingNonPatchableFields() throws JsonProcessingException {
