@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
-import org.assertj.core.util.Sets;
+import com.google.common.collect.Sets;
 
 import mil.tron.commonapi.dto.PersonDto;
 import mil.tron.commonapi.dto.PlatformJwtDto;

@@ -1,6 +1,6 @@
 package mil.tron.commonapi.service.documentspace;
 
-import org.assertj.core.util.Sets;
+import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
 import mil.tron.commonapi.annotation.minio.IfMinioEnabledOnIL4OrDevLocal;
 import mil.tron.commonapi.dto.appclient.AppClientSummaryDto;
