@@ -14,7 +14,7 @@ TRON Common API is a centralized RESTful backend service for the airmencoders ec
 - **Liquibase**: 4.31.1 (database migrations)
 - **Spring Security**: 6.5.x
 - **SpringDoc OpenAPI**: 2.8.17 (Swagger UI)
-- **Jackson**: Boot-managed 2.19.x (JSON processing)
+- **Jackson**: 2.21.4, Boot-managed (JSON processing)
 - **Lombok**: (compile-time code generation)
 - **Apache Camel**: 4.14.9 (integration/routing)
 - **AWS SDK S3**: 1.12.68
