@@ -9,6 +9,7 @@ Head commit inspected: `7b22ec561c2625ff1200156d058fcdd0ff022e69`. Evidence and 
 | Builds and tests on a plain Linux box with Maven | Baseline `mvn -B -DCI_COMMIT_SHORT_SHA=7b22ec56 test` on JDK 11 completes (949 tests, 1 failure — `02-risk-register.md` R-08). Only requirement outside the repo is a Maven mirror if Central rate-limits |
 | H2 profile only | Default `development` profile (`pom.xml:388-393`) → H2 in-memory `MODE=PostgreSQL` (`src/main/resources/application-development.properties:3`); tests use `application-test.properties` on top of it |
 | No external services | Candidate must not require MinIO/S3 (`minio.enabled=false` in `src/main/resources/application-test.properties:13`), a Puckboard host, a webhook listener, or app-source upstreams. Slices whose *service* publishes events are acceptable only if the publisher is mocked in existing tests |
+| Handler counts | Same parser as `00-inventory.md` §5.1 (method-level `@*Mapping` annotations in `@RestController` classes; class-level `@RequestMapping` excluded), so per-slice totals reconcile with the inventory's per-controller figures |
 | Test counts | `grep -c "@Test"` per test file (JUnit 5 `@Test`, JUnit 4 `@Test` for PowerMock classes). Counts are **per annotated method**, not parameterised expansions. Confidence High for the count, Medium for "exercises the slice" (attribution is by file name / package, not by coverage) |
 | Security-enabled coverage | Only 10 test classes set `security.enabled=true` (`grep -rl "security.enabled=true" src/test/java`): `AppClientIntegrationTest`, `AppSourceIntegrationTest`, `DocumentSpaceIntegrationTests`, `EntityFieldAuthIntegrationTests`, `HttpTraceIntegrationTest`, `InputFuzzer`, `JsonDbIntegrationTest`, `OrgRelationshipIntegrationTest`, `PubSubPrivsTest`, `ScratchStorageIntegrationTest` (all under `src/test/java/mil/tron/commonapi/integration/`) |
 
@@ -32,11 +33,11 @@ Head commit inspected: `7b22ec561c2625ff1200156d058fcdd0ff022e69`. Evidence and 
 
 | Aspect | Detail | Evidence |
 |---|---|---|
-| Scope | 40 handlers on `ScratchStorageController` (`/{v1,v2}/scratch`): app registry, key/value CRUD, JSON-path reads/patches, per-app user ACLs | `src/main/java/mil/tron/commonapi/controller/scratch/ScratchStorageController.java:45` (1,082 lines) |
+| Scope | 41 handlers on `ScratchStorageController` (`/{v1,v2}/scratch`): app registry, key/value CRUD, JSON-path reads/patches, per-app user ACLs | `src/main/java/mil/tron/commonapi/controller/scratch/ScratchStorageController.java:45` (1,082 lines) |
 | Files (main) | 25 under `*/scratch/`: 1 controller, 4 services (`ScratchStorageServiceImpl` 889 lines, `JsonDbServiceImpl` 410 lines), 4 repositories, 4 entities, 3 exceptions, DTOs | `find src/main/java -ipath '*scratch*' -name '*.java'` → 25 |
 | Why bounded | Self-contained tables (`scratch_storage*`), no S3/webhooks/Camel; external libraries are `json-path` (`ScratchStorageServiceImpl.java:7-10`) and Jackson only. However it embeds its **own authorization model** (`ScratchStorageAppUserPriv`, `digitize` app mapping in `AppClientUserPreAuthenticatedService.java:113-156`) and the `KEY`/`VALUE` column names that broke on H2 2.x in PR #4 | inline above |
 | Existing tests | **95**: `service/scratch/ScratchStorageServiceImplTest.java` (34), `controller/scratch/ScratchStorageControllerTest.java` (29), `integration/ScratchStorageIntegrationTest.java` (20, security-enabled), `service/scratch/JsonDbTests.java` (5), `integration/JsonDbIntegrationTest.java` (7, security-enabled) | `grep -c @Test` |
-| Gaps → characterization tests first | (1) authorization matrix for the 40 handlers with `security.enabled=true` (only 27 of 95 tests run secured); (2) H2 2.x compatibility probe for `KEY`/`VALUE` columns; (3) JSON-path edge cases (PR #5 NPE class) as regression fixtures | inline above |
+| Gaps → characterization tests first | (1) authorization matrix for the 41 handlers with `security.enabled=true` (only 27 of 95 tests run secured); (2) H2 2.x compatibility probe for `KEY`/`VALUE` columns; (3) JSON-path edge cases (PR #5 NPE class) as regression fixtures | inline above |
 | Risks touched | R-02, R-03, R-04, R-05, R-06 | inline above |
 | Confidence | High on constraints; Medium on boundedness (largest controller in the service after document space; couples to the pre-auth service). Raise: JaCoCo run restricted to the 5 test classes to measure line coverage of the 25 files | inline above |
 
@@ -56,7 +57,7 @@ Head commit inspected: `7b22ec561c2625ff1200156d058fcdd0ff022e69`. Evidence and 
 
 | Aspect | Detail | Evidence |
 |---|---|---|
-| Scope | 16 handlers on `OrganizationController`; service of 1,339 lines with EFA field protection, subordinate/parent graph, JSON Patch | `src/main/java/mil/tron/commonapi/controller/OrganizationController.java`, `src/main/java/mil/tron/commonapi/service/OrganizationServiceImpl.java` |
+| Scope | 17 handlers on `OrganizationController`; service of 1,339 lines with EFA field protection, subordinate/parent graph, JSON Patch | `src/main/java/mil/tron/commonapi/controller/OrganizationController.java`, `src/main/java/mil/tron/commonapi/service/OrganizationServiceImpl.java` |
 | Files (main) | controller, service pair, `OrganizationUniqueChecksService`, repository (+ specification filter), `entity/Organization`, ~10 DTOs, EFA service | `01-architecture.md` §2.2 |
 | Why bounded / not | Runs on H2 with no external services — **but** it publishes pub/sub events (`EventManagerService`, mocked in unit tests), has a `@Lazy` circular dependency with `PersonService` (`.windsurfrules` convention), and is exactly where PR #4 hit Hibernate 6 transient-instance failures. Its unit test uses **PowerMock** (`src/test/java/mil/tron/commonapi/service/OrganizationServiceImplTest.java:44-64`, `@RunWith(PowerMockRunner.class)`), so the test itself must be rewritten before the slice can run on JDK 17+ | inline above |
 | Existing tests | **115**: `service/OrganizationServiceImplTest.java` (44, PowerMock/JUnit 4), `controller/OrganizationControllerTest.java` (30), `integration/OrganizationIntegrationTest.java` (14), `integration/OrgRelationshipIntegrationTest.java` (14, secured), `entity/OrganizationTest.java` (11), `dto/OrganizationDtoTest.java` (1), `service/utility/OrganizationUniqueChecksServiceImplTest.java` (1); plus `integration/EntityFieldAuthIntegrationTests.java` (7, secured, shared with Person) | `grep -c @Test` |
@@ -66,7 +67,7 @@ Head commit inspected: `7b22ec561c2625ff1200156d058fcdd0ff022e69`. Evidence and 
 
 ### S-5 Person CRUD — considered and **not** recommended as first slice
 
-Same profile as S-4 (`PersonController` 13 handlers, `PersonServiceImpl` 576 lines, publishes events, EFA, `@Lazy` cycle with organizations, PII fields) with **75** tests (`controller/PersonControllerTest.java` 26, `service/PersonServiceImplTest.java` 27, `integration/PersonIntegrationTest.java` 15, `entity/PersonTests.java` 5, `service/utility/PersonUniqueChecksServiceImplTest.java` 2). It additionally depends on `Rank` (S-1) for rank resolution and on Puckboard ETL semantics (PR #6). Bounded enough for a second wave, not the first.
+Same profile as S-4 (`PersonController` 14 handlers, `PersonServiceImpl` 576 lines, publishes events, EFA, `@Lazy` cycle with organizations, PII fields) with **75** tests (`controller/PersonControllerTest.java` 26, `service/PersonServiceImplTest.java` 27, `integration/PersonIntegrationTest.java` 15, `entity/PersonTests.java` 5, `service/utility/PersonUniqueChecksServiceImplTest.java` 2). It additionally depends on `Rank` (S-1) for rank resolution and on Puckboard ETL semantics (PR #6). Bounded enough for a second wave, not the first.
 
 ### Rejected outright (fail the "no external services" constraint)
 
@@ -94,9 +95,9 @@ Confidence in the recommendation: High for S-1's suitability, Medium for the ord
 | Slice | Main files | Handlers | Existing tests (secured) | External deps | PowerMock | First-step fit |
 |---|---:|---:|---:|---|---|---|
 | S-1 Rank | 7 | 4 | 15 (0) | none | no | **Best** |
-| S-2 Scratch | 25 | 40 | 95 (27) | none | no | Good, large |
+| S-2 Scratch | 25 | 41 | 95 (27) | none | no | Good, large |
 | S-3 Dashboard users/privileges | 12 (+1) | 9 | 44 (0) | none | no | Good, security-critical |
-| S-4 Organization | ~18 | 16 | 115 (21) | events (mocked) | **yes** | Later |
-| S-5 Person | ~15 | 13 | 75 (7) | events (mocked), ranks | no | Later |
+| S-4 Organization | ~18 | 17 | 115 (21) | events (mocked) | **yes** | Later |
+| S-5 Person | ~15 | 14 | 75 (7) | events (mocked), ranks | no | Later |
 
 Counts derived on the checkout with `find`/`grep -c "@Test"`; handler counts exclude class-level `@RequestMapping`. Confidence: High (counts) / Medium (attribution of shared integration classes to a single slice).
