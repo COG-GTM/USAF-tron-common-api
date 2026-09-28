@@ -26,7 +26,7 @@ import mil.tron.commonapi.service.documentspace.DocumentSpaceUserCollectionServi
 import mil.tron.commonapi.service.documentspace.util.FilePathSpec;
 import mil.tron.commonapi.service.documentspace.util.FilePathSpecWithContents;
 import org.apache.commons.io.FilenameUtils;
-import org.springdoc.api.annotations.ParameterObject;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -42,8 +42,8 @@ import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 import org.springframework.web.servlet.resource.ResourceUrlProvider;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import java.security.Principal;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -227,8 +227,7 @@ public class DocumentSpaceController {
 				description = "Not Found - space not found",
 				content = @Content(schema = @Schema(implementation = ExceptionResponse.class)))
 	})
-	@PreAuthorizeOnlySSO
-	@PreAuthorize("@accessCheckDocumentSpace.hasMembershipAccess(authentication, #id)")
+	@PreAuthorize("!hasAuthority('APP_CLIENT') and @accessCheckDocumentSpace.hasMembershipAccess(authentication, #id)")
 	@DeleteMapping("/spaces/{id}/users/dashboard")
     public ResponseEntity<Object> removeUserFromDocumentSpace(
     		@PathVariable UUID id,
@@ -1057,8 +1056,7 @@ public class DocumentSpaceController {
 					description = "Not Found - space not found",
 					content = @Content(schema = @Schema(implementation = ExceptionResponse.class)))
 	})
-	@PreAuthorizeOnlySSO
-	@PreAuthorize("@accessCheckDocumentSpace.hasMembershipAccess(authentication, #id)")
+	@PreAuthorize("!hasAuthority('APP_CLIENT') and @accessCheckDocumentSpace.hasMembershipAccess(authentication, #id)")
 	@DeleteMapping("/spaces/{id}/app-client")
 	public ResponseEntity<Object> removeAppClientFromDocumentSpace(
 			@PathVariable UUID id,
@@ -1080,8 +1078,7 @@ public class DocumentSpaceController {
 					content = @Content(schema = @Schema(implementation = ExceptionResponse.class)))
 	})
 	@WrappedEnvelopeResponse
-	@PreAuthorizeOnlySSO
-	@PreAuthorize("@accessCheckDocumentSpace.hasMembershipAccess(authentication, #id)")
+	@PreAuthorize("!hasAuthority('APP_CLIENT') and @accessCheckDocumentSpace.hasMembershipAccess(authentication, #id)")
 	@GetMapping("/spaces/{id}/app-clients")
 	public ResponseEntity<List<DocumentSpaceAppClientResponseDto>> getAppClientUsersForDocumentSpace(@PathVariable UUID id) {
 		return ResponseEntity.ok(documentSpaceService.getAppClientsForDocumentSpace(id));
@@ -1101,8 +1098,7 @@ public class DocumentSpaceController {
 					content = @Content(schema = @Schema(implementation = ExceptionResponse.class)))
 	})
 	@WrappedEnvelopeResponse
-	@PreAuthorizeOnlySSO
-	@PreAuthorize("@accessCheckDocumentSpace.hasMembershipAccess(authentication, #id)")
+	@PreAuthorize("!hasAuthority('APP_CLIENT') and @accessCheckDocumentSpace.hasMembershipAccess(authentication, #id)")
 	@GetMapping("/spaces/{id}/available-app-clients")
 	public ResponseEntity<List<AppClientSummaryDto>> getAppClientsForAssignmentToDocumentSpace(@PathVariable UUID id) {
 		return ResponseEntity.ok(documentSpaceService.getAppClientsForAssignmentToDocumentSpace(id));

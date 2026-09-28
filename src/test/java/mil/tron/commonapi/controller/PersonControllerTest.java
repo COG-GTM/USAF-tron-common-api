@@ -17,7 +17,7 @@ import mil.tron.commonapi.service.PersonConversionOptions;
 import mil.tron.commonapi.service.PersonFindType;
 import mil.tron.commonapi.service.PersonService;
 import mil.tron.commonapi.service.UserInfoService;
-import org.assertj.core.util.Lists;
+import com.google.common.collect.Lists;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;

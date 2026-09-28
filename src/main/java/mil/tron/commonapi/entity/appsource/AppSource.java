@@ -5,9 +5,9 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 import mil.tron.commonapi.entity.DashboardUser;
 
-import javax.persistence.*;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
+import jakarta.persistence.*;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 import java.util.Date;
 import java.util.HashSet;

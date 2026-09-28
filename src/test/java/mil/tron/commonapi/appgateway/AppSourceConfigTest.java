@@ -20,15 +20,14 @@ public class AppSourceConfigTest {
 
     @Test
     void testRegisterAppSource() {
-        AppSourceRepository spyRepo = Mockito.spy(this.appSourceRepository);
         AppSourceInterfaceDefinition appSourceDef = new AppSourceInterfaceDefinition("Name",
                 "filename.yml", "http:////sourceurl", "/path");
         ArgumentCaptor<AppSource> captor = ArgumentCaptor.forClass(AppSource.class);
         AppSourceConfig appSourceConfig = new AppSourceConfig(
-                spyRepo, "noDef"
+                appSourceRepository, "noDef"
         );
         appSourceConfig.registerAppSource(appSourceDef);
-        verify(spyRepo).save(captor.capture());
+        verify(appSourceRepository).save(captor.capture());
         AppSource captorValue = captor.getValue();
         assertThat(captorValue.getName()).isEqualTo(appSourceDef.getName());
         assertThat(captorValue.getOpenApiSpecFilename()).isEqualTo(appSourceDef.getOpenApiSpecFilename());

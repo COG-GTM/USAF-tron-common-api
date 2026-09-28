@@ -13,7 +13,7 @@ import mil.tron.commonapi.dto.HttpLogDtoPaginationResponseWrapper;
 import mil.tron.commonapi.dto.HttpLogEntryDetailsDto;
 import mil.tron.commonapi.exception.BadRequestException;
 import mil.tron.commonapi.service.trace.HttpTraceService;
-import org.springdoc.api.annotations.ParameterObject;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;

@@ -24,7 +24,7 @@ import mil.tron.commonapi.pubsub.EventManagerService;
 import mil.tron.commonapi.service.AppClientUserService;
 import mil.tron.commonapi.service.pubsub.SubscriberService;
 import mil.tron.commonapi.service.utility.IstioHeaderUtils;
-import org.assertj.core.util.Lists;
+import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +32,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;

@@ -12,8 +12,8 @@ import mil.tron.commonapi.validations.NullOrNotBlankValidation;
 import mil.tron.commonapi.validations.ValidDodId;
 import mil.tron.commonapi.validations.ValidPhoneNumber;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Size;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;

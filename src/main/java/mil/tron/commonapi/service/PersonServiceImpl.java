@@ -33,7 +33,7 @@ import mil.tron.commonapi.service.fieldauth.EntityFieldAuthResponse;
 import mil.tron.commonapi.service.fieldauth.EntityFieldAuthService;
 import mil.tron.commonapi.service.utility.PersonUniqueChecksService;
 import mil.tron.commonapi.service.utility.ValidatorService;
-import org.assertj.core.util.Lists;
+import com.google.common.collect.Lists;
 import org.modelmapper.Conditions;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
@@ -45,7 +45,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -123,11 +123,12 @@ public class PersonServiceImpl implements PersonService {
 		Person resultEntity = repository.save(entity);
 		PersonDto result = convertToDto(resultEntity, null);
 		if (dto.getMeta() != null) {
+			Set<PersonMetadata> savedMetadata = new HashSet<>();
 			dto.getMeta().forEach((key, value) -> {
-				resultEntity.getMetadata().add(new PersonMetadata(result.getId(), key, value));
+				savedMetadata.add(personMetadataRepository.save(new PersonMetadata(result.getId(), key, value)));
 				result.setMetaProperty(key, value);
 			});
-			personMetadataRepository.saveAll(resultEntity.getMetadata());
+			resultEntity.getMetadata().addAll(savedMetadata);
 		}
 
 		return result;

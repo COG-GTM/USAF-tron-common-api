@@ -13,7 +13,7 @@ import mil.tron.commonapi.repository.DashboardUserRepository;
 import mil.tron.commonapi.repository.PrivilegeRepository;
 import mil.tron.commonapi.service.scratch.ScratchStorageServiceImpl;
 import mil.tron.commonapi.service.utility.DashboardUserUniqueChecksServiceImpl;
-import org.assertj.core.util.Lists;
+import com.google.common.collect.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

@@ -22,6 +22,7 @@ import mil.tron.commonapi.entity.documentspace.DocumentSpace;
 import mil.tron.commonapi.entity.documentspace.DocumentSpaceDashboardMemberPrivilegeRow;
 import mil.tron.commonapi.entity.documentspace.DocumentSpaceFileSystemEntry;
 import mil.tron.commonapi.entity.documentspace.DocumentSpacePrivilege;
+import mil.tron.commonapi.exception.BadRequestException;
 import mil.tron.commonapi.exception.NotAuthorizedException;
 import mil.tron.commonapi.exception.RecordNotFoundException;
 import mil.tron.commonapi.repository.DashboardUserRepository;
@@ -33,8 +34,7 @@ import mil.tron.commonapi.service.documentspace.util.FilePathSpecWithContents;
 import mil.tron.commonapi.service.documentspace.util.FileSystemElementTree;
 import mil.tron.commonapi.service.documentspace.util.S3ObjectAndFilename;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.assertj.core.util.Lists;
-import org.junit.Assert;
+import com.google.common.collect.Lists;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -967,6 +967,18 @@ class DocumentSpaceServiceImplTest {
 			assertEquals("Duplicate email found on row 4", exceptionStrings.get(0));
 		}
 
+		@Test
+		void behavioralDifference_unterminatedQuoteIsRejectedAsBadRequestInsteadOfSilentlyDroppingTheTail() throws IOException {
+			Mockito.when(documentSpaceRepo.findById(documentSpaceId)).thenReturn(Optional.of(entity));
+
+			MockMultipartFile file = new MockMultipartFile("filename.txt", new FileInputStream("src/test/resources/dashboard-user-csv/unterminated-quote.csv"));
+
+			assertThatThrownBy(() -> documentService.batchAddDashboardUserToDocumentSpace(documentSpaceId, file))
+					.isInstanceOf(BadRequestException.class)
+					.hasMessage("Failed retrieving uploaded file");
+			Mockito.verify(documentSpaceRepo, Mockito.never()).save(Mockito.any());
+		}
+
 	}
 
 	@Nested
@@ -996,7 +1008,7 @@ class DocumentSpaceServiceImplTest {
 
 
 			entity.addDashboardUser(dashboardUser);
-			Assert.assertNull(dashboardUser.getDefaultDocumentSpaceId());
+			assertNull(dashboardUser.getDefaultDocumentSpaceId());
 
 			documentService.setDashboardUserDefaultDocumentSpace(documentSpaceId, dashboardUser.getEmail());
 

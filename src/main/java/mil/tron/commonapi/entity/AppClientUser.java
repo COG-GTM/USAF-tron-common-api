@@ -8,7 +8,7 @@ import mil.tron.commonapi.entity.documentspace.DocumentSpace;
 import mil.tron.commonapi.entity.documentspace.DocumentSpacePrivilege;
 import mil.tron.commonapi.validations.ValidSubscriberAddress;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -46,7 +46,7 @@ public class AppClientUser extends App {
 	@Getter
 	@Setter
 	@Builder.Default
-	@ManyToMany
+	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	private Set<DashboardUser> appClientDevelopers = new HashSet<>();
 
 	@Getter

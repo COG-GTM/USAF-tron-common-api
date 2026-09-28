@@ -2,8 +2,8 @@ package mil.tron.commonapi.validations;
 
 import org.springframework.util.StringUtils;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 import java.util.regex.Pattern;
 
 public class DocSpaceFolderOrFilenameValidator implements ConstraintValidator<ValidDocSpaceFolderOrFilename, String> {

@@ -1,17 +1,19 @@
 package mil.tron.commonapi.security;
 
-import mil.tron.commonapi.exception.AuthManagerException;
 import mil.tron.commonapi.service.AppClientUserPreAuthenticatedService;
 import mil.tron.commonapi.service.trace.TraceRequestFilter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.access.ExceptionTranslationFilter;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.config.Customizer;
 
 import static mil.tron.commonapi.service.DashboardUserServiceImpl.DASHBOARD_ADMIN_PRIV;
 import static mil.tron.commonapi.service.DashboardUserServiceImpl.DASHBOARD_USER_PRIV;
@@ -19,59 +21,47 @@ import static mil.tron.commonapi.service.DashboardUserServiceImpl.DASHBOARD_USER
 @Configuration
 @ConditionalOnProperty(name = "security.enabled", havingValue="true")
 @EnableWebSecurity
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+public class WebSecurityConfig {
 
-	private TraceRequestFilter traceRequestFilter;
+	private final TraceRequestFilter traceRequestFilter;
 
-	private AppClientUserPreAuthenticatedService appClientUserService;
+	private final AppClientUserPreAuthenticatedService appClientUserService;
 	public WebSecurityConfig(AppClientUserPreAuthenticatedService appClientUserService,
 							 TraceRequestFilter traceRequestFilter) {
 		this.appClientUserService = appClientUserService;
 		this.traceRequestFilter = traceRequestFilter;
 	}
 	
-	@Override
-	public void configure(AuthenticationManagerBuilder auth) throws Exception {
-    	PreAuthenticatedAuthenticationProvider preAuthenticatedAuthenticationProvider = new PreAuthenticatedAuthenticationProvider();
-    	preAuthenticatedAuthenticationProvider.setPreAuthenticatedUserDetailsService(appClientUserService);
-    	auth.authenticationProvider(preAuthenticatedAuthenticationProvider);
+	@Bean
+	public AuthenticationManager authenticationManager() {
+		PreAuthenticatedAuthenticationProvider preAuthenticatedAuthenticationProvider =
+				new PreAuthenticatedAuthenticationProvider();
+		preAuthenticatedAuthenticationProvider.setPreAuthenticatedUserDetailsService(appClientUserService);
+		return new ProviderManager(preAuthenticatedAuthenticationProvider);
 	}
 	
-	@Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http
-        	.addFilter(appClientPreAuthFilter())
-        	.authorizeRequests()
-				.antMatchers("/").permitAll()  // for swagger redirect to work at root of api
-				.antMatchers("/api-docs/**").permitAll()
-        		.antMatchers("/api-docs**").permitAll()
-				.antMatchers("/actuator/httptrace").denyAll() // deny viewing http trace (have to look in db)
-				.antMatchers("/actuator/health/**").hasAuthority(DASHBOARD_USER_PRIV)
-				.antMatchers("/actuator/logfile").hasAuthority(DASHBOARD_ADMIN_PRIV)
-				.antMatchers("/puckboard/**").hasAuthority(DASHBOARD_ADMIN_PRIV)
-	            .anyRequest()
-	            	.authenticated()
-            .and()
-        	.cors()
-        	.and()
-            .csrf()
-        		.disable()
-        	.sessionManagement()
-	        	.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-			.and()
+	@Bean
+	public SecurityFilterChain filterChain(HttpSecurity http, AuthenticationManager authenticationManager)
+			throws Exception {
+		AppClientPreAuthFilter appClientPreAuthFilter = new AppClientPreAuthFilter();
+		appClientPreAuthFilter.setAuthenticationManager(authenticationManager);
+		http
+				.addFilter(appClientPreAuthFilter)
+				.authorizeHttpRequests(auth -> auth
+						.requestMatchers("/").permitAll()
+						.requestMatchers("/api-docs/**", "/api-docs**").permitAll()
+						.requestMatchers("/actuator/httpexchanges").denyAll()
+						.requestMatchers("/actuator/health/**").hasAuthority(DASHBOARD_USER_PRIV)
+						.requestMatchers("/actuator/logfile").hasAuthority(DASHBOARD_ADMIN_PRIV)
+						.requestMatchers("/puckboard/**").hasAuthority(DASHBOARD_ADMIN_PRIV)
+						.anyRequest().authenticated())
+				.cors(Customizer.withDefaults())
+				.csrf(csrf -> csrf.disable())
+				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.addFilterBefore(traceRequestFilter, ExceptionTranslationFilter.class)
-			.headers()
-			.contentSecurityPolicy("default-src 'self' 'unsafe-inline' 'unsafe-eval' *.dso.mil data:");
+				.headers(headers -> headers.contentSecurityPolicy(csp ->
+						csp.policyDirectives("default-src 'self' 'unsafe-inline' 'unsafe-eval' *.dso.mil data:")));
+		return http.build();
     }
     
-	public AppClientPreAuthFilter appClientPreAuthFilter() throws AuthManagerException {
-		AppClientPreAuthFilter filter = new AppClientPreAuthFilter();
-		try {
-			filter.setAuthenticationManager(authenticationManager());
-		} catch (Exception ex) {
-			throw new AuthManagerException(ex.getLocalizedMessage());
-		}
-		return filter;
-	}
 }
-

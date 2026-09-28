@@ -21,7 +21,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;

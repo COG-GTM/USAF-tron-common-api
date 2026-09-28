@@ -4,7 +4,7 @@ import mil.tron.commonapi.entity.scratch.ScratchStorageEntry;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import java.util.Optional;
 import java.util.UUID;
 

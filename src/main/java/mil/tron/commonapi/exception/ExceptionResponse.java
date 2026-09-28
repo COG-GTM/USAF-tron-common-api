@@ -3,7 +3,7 @@ package mil.tron.commonapi.exception;
 import java.util.Date;
 import java.util.List;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;

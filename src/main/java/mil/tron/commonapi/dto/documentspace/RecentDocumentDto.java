@@ -4,7 +4,7 @@ package mil.tron.commonapi.dto.documentspace;
 import java.util.Date;
 import java.util.UUID;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 

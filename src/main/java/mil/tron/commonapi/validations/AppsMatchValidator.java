@@ -1,7 +1,7 @@
 package mil.tron.commonapi.validations;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 import org.springframework.beans.BeanWrapperImpl;
 

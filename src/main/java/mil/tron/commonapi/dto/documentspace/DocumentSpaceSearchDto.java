@@ -2,8 +2,8 @@ package mil.tron.commonapi.dto.documentspace;
 
 import lombok.*;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * Used for sending search query to document space

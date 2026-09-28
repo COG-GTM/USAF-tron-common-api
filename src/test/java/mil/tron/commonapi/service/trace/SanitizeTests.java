@@ -2,7 +2,7 @@ package mil.tron.commonapi.service.trace;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.trace.http.HttpTrace;
+import org.springframework.boot.actuate.web.exchanges.HttpExchange;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.net.URI;
@@ -20,12 +20,11 @@ public class SanitizeTests {
     @Test
     void testSanitize() throws URISyntaxException {
 
-        HttpTrace.Request request = new HttpTrace.Request("POST",
+        HttpExchange.Request request = new HttpExchange.Request(
                 new URI("https://tron-common-api-il4.apps.dso.mil/api/app/arms-gateway/training-svc/"),
-                new HashMap<>(),
-                "local");
+                "POST", "local", new HashMap<>());
 
-        HttpTrace trace = new HttpTrace(request, null, null, null, null, 1000L);
+        HttpExchange trace = new HttpExchange(java.time.Instant.now(), request, null, null, null, java.time.Duration.ofMillis(1000));
 
         ContentTrace contentTrace = new ContentTrace();
         contentTrace.setRequestBody("some sensitive stuff");
@@ -36,12 +35,11 @@ public class SanitizeTests {
         assertEquals("Redacted", contentTrace.getRequestBody());
         assertEquals("Redacted", contentTrace.getResponseBody());
 
-        HttpTrace.Request request2 = new HttpTrace.Request("POST",
+        HttpExchange.Request request2 = new HttpExchange.Request(
                 new URI("https://tron-common-api-il4.apps.dso.mil/api/app/puckboard/events/"),
-                new HashMap<>(),
-                "local");
+                "POST", "local", new HashMap<>());
 
-        HttpTrace trace2 = new HttpTrace(request2, null, null, null, null, 1000L);
+        HttpExchange trace2 = new HttpExchange(java.time.Instant.now(), request2, null, null, null, java.time.Duration.ofMillis(1000));
 
         ContentTrace contentTrace2 = new ContentTrace();
         contentTrace.setRequestBody("some stuff");

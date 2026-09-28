@@ -14,7 +14,7 @@ import mil.tron.commonapi.repository.DashboardUserRepository;
 import mil.tron.commonapi.repository.PrivilegeRepository;
 import mil.tron.commonapi.service.scratch.ScratchStorageService;
 import mil.tron.commonapi.service.utility.DashboardUserUniqueChecksService;
-import org.assertj.core.util.Lists;
+import com.google.common.collect.Lists;
 import org.modelmapper.Conditions;
 import org.modelmapper.Converter;
 import org.modelmapper.spi.MappingContext;

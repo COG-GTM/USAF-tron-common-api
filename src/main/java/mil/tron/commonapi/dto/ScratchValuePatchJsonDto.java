@@ -3,7 +3,7 @@ package mil.tron.commonapi.dto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 /**
  * A DTO to carry a value and a json path string to update/set a field

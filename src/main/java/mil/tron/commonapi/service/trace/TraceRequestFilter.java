@@ -1,21 +1,20 @@
 package mil.tron.commonapi.service.trace;
 
-import org.springframework.boot.actuate.trace.http.HttpExchangeTracer;
-import org.springframework.boot.actuate.trace.http.HttpTraceRepository;
-import org.springframework.boot.actuate.web.trace.servlet.HttpTraceFilter;
+import org.springframework.boot.actuate.autoconfigure.web.exchanges.HttpExchangesProperties;
+import org.springframework.boot.actuate.web.exchanges.HttpExchangeRepository;
+import org.springframework.boot.actuate.web.exchanges.servlet.HttpExchangesFilter;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-
+import jakarta.servlet.http.HttpServletRequest;
 /**
  * This configures the HttpTracer to NOT log requests to specific endpoints - which we really don't care about,
  * or they are just reachable in a dev environment.
  */
 @Component
-public class TraceRequestFilter extends HttpTraceFilter {
+public class TraceRequestFilter extends HttpExchangesFilter {
 
-    public TraceRequestFilter(HttpTraceRepository repository, HttpExchangeTracer tracer) {
-        super(repository, tracer);
+    public TraceRequestFilter(HttpExchangeRepository repository, HttpExchangesProperties properties) {
+        super(repository, properties.getRecording().getInclude());
     }
 
     /**

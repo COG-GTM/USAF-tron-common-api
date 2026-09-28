@@ -3,7 +3,7 @@ package mil.tron.commonapi.entity.scratch;
 import lombok.*;
 import mil.tron.commonapi.entity.Privilege;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.UUID;
 
 /**

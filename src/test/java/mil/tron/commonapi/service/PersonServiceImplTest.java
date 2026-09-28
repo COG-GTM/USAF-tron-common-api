@@ -25,7 +25,7 @@ import mil.tron.commonapi.service.utility.PersonUniqueChecksServiceImpl;
 import mil.tron.commonapi.service.utility.ValidatorService;
 
 import org.apache.commons.lang3.StringUtils;
-import org.assertj.core.util.Lists;
+import com.google.common.collect.Lists;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

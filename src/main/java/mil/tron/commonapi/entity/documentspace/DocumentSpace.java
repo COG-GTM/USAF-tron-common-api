@@ -6,10 +6,10 @@ import java.util.UUID;
 import java.util.EnumMap;
 import java.util.HashSet;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -38,14 +38,14 @@ public class DocumentSpace {
 	@Column(unique = true)
 	private String name;
 	
-	@OneToMany(mappedBy="documentSpace")
+	@OneToMany(mappedBy="documentSpace", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	@MapKeyEnumerated(EnumType.STRING)
 	@MapKey(name="type")
 	@Builder.Default
 	@EqualsAndHashCode.Exclude
 	private Map<DocumentSpacePrivilegeType, DocumentSpacePrivilege> privileges = new EnumMap<>(DocumentSpacePrivilegeType.class);
 	
-	@ManyToMany
+	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
 	@JoinTable(
 			name="document_space_dashboard_users",
     		joinColumns=@JoinColumn(name="document_space_id", referencedColumnName="id"),
@@ -93,6 +93,10 @@ public class DocumentSpace {
 
 	public boolean addFileSystemEntry(DocumentSpaceFileSystemEntry entry) {
 		return fileSystemEntries.add(entry);
+	}
+
+	public boolean removeFileSystemEntry(DocumentSpaceFileSystemEntry entry) {
+		return fileSystemEntries.remove(entry);
 	}
     
     public void addPrivilege(DocumentSpacePrivilege privilege) {

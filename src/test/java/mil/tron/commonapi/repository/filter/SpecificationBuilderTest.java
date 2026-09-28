@@ -8,12 +8,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.powermock.reflect.Whitebox;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ReflectionUtils;
 
 import mil.tron.commonapi.dto.PrivilegeDto;
 import mil.tron.commonapi.dto.appclient.AppClientUserDto;
@@ -51,12 +51,21 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)
 class SpecificationBuilderTest {
+	private static Method getMethod(String name, Class<?>... parameterTypes) {
+		Method method = ReflectionUtils.findMethod(SpecificationBuilder.class, name, parameterTypes);
+		if (method == null) {
+			throw new IllegalStateException("Method not found: " + name);
+		}
+		method.setAccessible(true);
+		return method;
+	}
+
 	@Nested
 	class CastingToTypeTest {
 		@Test
 		void shouldReturnDouble_whenTypeIsDouble()
 				throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-			Method method = Whitebox.getMethod(SpecificationBuilder.class, "castToRequiredType", Class.class,
+			Method method = getMethod("castToRequiredType", Class.class,
 					String.class, String.class);
 			Object value = method.invoke(null, Double.class, "fieldName", "0.18");
 
@@ -68,7 +77,7 @@ class SpecificationBuilderTest {
 		@Test
 		void shouldReturnInteger_whenTypeIsInteger()
 				throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-			Method method = Whitebox.getMethod(SpecificationBuilder.class, "castToRequiredType", Class.class,
+			Method method = getMethod("castToRequiredType", Class.class,
 					String.class, String.class);
 			Object value = method.invoke(null, Integer.class, "fieldName", "1");
 
@@ -80,7 +89,7 @@ class SpecificationBuilderTest {
 		@Test
 		void shouldReturnLong_whenTypeIsLong()
 				throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-			Method method = Whitebox.getMethod(SpecificationBuilder.class, "castToRequiredType", Class.class,
+			Method method = getMethod("castToRequiredType", Class.class,
 					String.class, String.class);
 			Object value = method.invoke(null, long.class, "fieldName", "1");
 
@@ -92,7 +101,7 @@ class SpecificationBuilderTest {
 		@Test
 		void shouldReturnEnum_whenTypeIsEnum()
 				throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-			Method method = Whitebox.getMethod(SpecificationBuilder.class, "castToRequiredType", Class.class,
+			Method method = getMethod("castToRequiredType", Class.class,
 					String.class, String.class);
 			Object value = method.invoke(null, Branch.class, "fieldName", "USA");
 
@@ -105,7 +114,7 @@ class SpecificationBuilderTest {
 		void shouldReturnUUID_whenTypeIsUUID()
 				throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 			UUID id = UUID.randomUUID();
-			Method method = Whitebox.getMethod(SpecificationBuilder.class, "castToRequiredType", Class.class,
+			Method method = getMethod("castToRequiredType", Class.class,
 					String.class, String.class);
 			Object value = method.invoke(null, UUID.class, "fieldName", id.toString());
 
@@ -119,7 +128,7 @@ class SpecificationBuilderTest {
 				throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 			String stringDate = "2021-09-28T08:29:37Z";
 			Date date = new Date(1632817777000L);
-			Method method = Whitebox.getMethod(SpecificationBuilder.class, "castToRequiredType", Class.class,
+			Method method = getMethod("castToRequiredType", Class.class,
 					String.class, String.class);
 			Object value = method.invoke(null, Date.class, "fieldName", stringDate);
 
@@ -131,7 +140,7 @@ class SpecificationBuilderTest {
 		@Test
 		void shouldReturnBoolean_whenTypeIsBoolean()
 				throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-			Method method = Whitebox.getMethod(SpecificationBuilder.class, "castToRequiredType", Class.class,
+			Method method = getMethod("castToRequiredType", Class.class,
 					String.class, String.class);
 			Object value = method.invoke(null, Boolean.class, "fieldName", "true");
 
@@ -148,7 +157,7 @@ class SpecificationBuilderTest {
 		@Test
 		void shouldReturnString_whenTypeDoesNotMatch()
 				throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-			Method method = Whitebox.getMethod(SpecificationBuilder.class, "castToRequiredType", Class.class,
+			Method method = getMethod("castToRequiredType", Class.class,
 					String.class, String.class);
 			Object value = method.invoke(null, Boolean.class, "fieldName", "string value");
 
@@ -159,7 +168,7 @@ class SpecificationBuilderTest {
 
 		@Test
 		void shouldThrow_whenGivenBadEnum() throws IllegalAccessException, IllegalArgumentException {
-			Method method = Whitebox.getMethod(SpecificationBuilder.class, "castToRequiredType", Class.class,
+			Method method = getMethod("castToRequiredType", Class.class,
 					String.class, String.class);
 
 			try {
@@ -173,7 +182,7 @@ class SpecificationBuilderTest {
 		void shouldReturnListOfIntegers_whenTypeIsInteger()
 				throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 			List<String> values = List.of("1", "2", "3");
-			Method method = Whitebox.getMethod(SpecificationBuilder.class, "castToRequiredType", Class.class,
+			Method method = getMethod("castToRequiredType", Class.class,
 					String.class, List.class);
 			Object value = method.invoke(null, Integer.class, "fieldName", values);
 
@@ -190,9 +199,9 @@ class SpecificationBuilderTest {
 
 		@BeforeEach
 		void setup() {
-			validateOperatorSupportsInputTypeMethod = Whitebox.getMethod(SpecificationBuilder.class,
+			validateOperatorSupportsInputTypeMethod = getMethod(
 					"validateOperatorSupportsInputType", QueryOperator.class, Class.class);
-			checkOperatorSupportsInput = Whitebox.getMethod(SpecificationBuilder.class, "checkOperatorSupportsInput",
+			checkOperatorSupportsInput = getMethod("checkOperatorSupportsInput",
 					QueryOperator.class, Class.class, String.class);
 		}
 
