@@ -3,7 +3,7 @@ FROM centos:7 as wgetsrc
 RUN yum install wget -y
 
 # Load the hardened jdk image we use to run puckboard
-FROM registry.il2.dso.mil/platform-one/devops/pipeline-templates/ironbank/maven-jdk11:3.6.3
+FROM registry.il2.dso.mil/platform-one/devops/pipeline-templates/ironbank/maven-jdk21:3.9.9
 
 ENV CONTEXTS DEV
 
