@@ -14,7 +14,7 @@ import mil.tron.commonapi.repository.filter.QueryOperator;
 import mil.tron.commonapi.repository.filter.RelationType;
 import mil.tron.commonapi.service.PersonFindType;
 import mil.tron.commonapi.service.PersonService;
-import org.assertj.core.util.Lists;
+import com.google.common.collect.Lists;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;

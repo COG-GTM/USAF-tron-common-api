@@ -33,8 +33,7 @@ import mil.tron.commonapi.service.documentspace.util.FilePathSpecWithContents;
 import mil.tron.commonapi.service.documentspace.util.FileSystemElementTree;
 import mil.tron.commonapi.service.documentspace.util.S3ObjectAndFilename;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.assertj.core.util.Lists;
-import org.junit.Assert;
+import com.google.common.collect.Lists;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -996,7 +995,7 @@ class DocumentSpaceServiceImplTest {
 
 
 			entity.addDashboardUser(dashboardUser);
-			Assert.assertNull(dashboardUser.getDefaultDocumentSpaceId());
+			assertNull(dashboardUser.getDefaultDocumentSpaceId());
 
 			documentService.setDashboardUserDefaultDocumentSpace(documentSpaceId, dashboardUser.getEmail());
 

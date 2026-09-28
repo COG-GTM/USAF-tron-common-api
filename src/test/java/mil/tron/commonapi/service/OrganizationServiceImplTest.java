@@ -27,7 +27,7 @@ import mil.tron.commonapi.service.utility.OrganizationUniqueChecksServiceImpl;
 import mil.tron.commonapi.service.utility.ValidatorService;
 
 import org.aspectj.weaver.ast.Or;
-import org.assertj.core.util.Lists;
+import com.google.common.collect.Lists;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

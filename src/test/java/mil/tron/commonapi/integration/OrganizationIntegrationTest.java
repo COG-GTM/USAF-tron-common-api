@@ -23,7 +23,7 @@ import mil.tron.commonapi.repository.filter.QueryOperator;
 import mil.tron.commonapi.service.OrganizationService;
 import mil.tron.commonapi.service.PersonConversionOptions;
 import mil.tron.commonapi.service.PersonService;
-import org.assertj.core.util.Lists;
+import com.google.common.collect.Lists;
 import org.hamcrest.Matchers;
 import org.json.JSONArray;
 import org.json.JSONObject;
