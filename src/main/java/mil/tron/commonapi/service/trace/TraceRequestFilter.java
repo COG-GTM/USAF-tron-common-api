@@ -5,7 +5,7 @@ import org.springframework.boot.actuate.trace.http.HttpTraceRepository;
 import org.springframework.boot.actuate.web.trace.servlet.HttpTraceFilter;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * This configures the HttpTracer to NOT log requests to specific endpoints - which we really don't care about,

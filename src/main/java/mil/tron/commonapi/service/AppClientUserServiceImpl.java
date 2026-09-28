@@ -37,7 +37,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 
 import static mil.tron.commonapi.service.DashboardUserServiceImpl.DASHBOARD_USER_PRIV;
 

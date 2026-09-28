@@ -6,7 +6,7 @@ import lombok.*;
 import mil.tron.commonapi.annotation.security.PiiField;
 import mil.tron.commonapi.validations.ValidDodId;
 
-import javax.validation.constraints.Email;
+import jakarta.validation.constraints.Email;
 
 /**
  * Represents the parts we care about from a P1 Istio JWT

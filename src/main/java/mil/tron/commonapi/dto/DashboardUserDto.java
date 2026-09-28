@@ -5,8 +5,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
-import javax.persistence.Id;
-import javax.validation.constraints.Email;
+import jakarta.persistence.Id;
+import jakarta.validation.constraints.Email;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;

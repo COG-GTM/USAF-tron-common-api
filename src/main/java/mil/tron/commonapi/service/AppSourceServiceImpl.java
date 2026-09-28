@@ -45,7 +45,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;

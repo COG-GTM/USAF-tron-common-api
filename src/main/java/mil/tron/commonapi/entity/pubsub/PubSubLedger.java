@@ -5,7 +5,7 @@ import lombok.*;
 import mil.tron.commonapi.entity.pubsub.events.EventType;
 import org.hibernate.annotations.CreationTimestamp;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.Date;
 import java.util.UUID;
 

@@ -54,7 +54,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;

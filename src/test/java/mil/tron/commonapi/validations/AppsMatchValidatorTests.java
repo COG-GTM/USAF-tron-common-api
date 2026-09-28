@@ -6,7 +6,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.UUID;
 
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidatorContext;
 
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;

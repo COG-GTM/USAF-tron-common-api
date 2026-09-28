@@ -26,7 +26,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.server.ResponseStatusException;
 import org.apache.camel.builder.RouteBuilder;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;

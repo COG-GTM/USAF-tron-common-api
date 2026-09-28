@@ -15,7 +15,7 @@ import org.assertj.core.util.Lists;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;

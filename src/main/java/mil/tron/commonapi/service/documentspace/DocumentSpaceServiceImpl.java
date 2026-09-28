@@ -40,8 +40,8 @@ import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.transaction.Transactional;
-import javax.validation.constraints.NotNull;
+import jakarta.transaction.Transactional;
+import jakarta.validation.constraints.NotNull;
 import java.io.*;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;

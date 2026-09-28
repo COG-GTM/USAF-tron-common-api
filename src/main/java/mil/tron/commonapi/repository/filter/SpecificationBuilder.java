@@ -6,10 +6,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import javax.persistence.criteria.Expression;
-import javax.persistence.criteria.Join;
-import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Root;
+import jakarta.persistence.criteria.Expression;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.Path;
+import jakarta.persistence.criteria.Root;
 
 import org.hibernate.query.criteria.internal.BasicPathUsageException;
 import org.springframework.data.jpa.domain.Specification;

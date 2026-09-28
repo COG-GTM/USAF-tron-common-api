@@ -9,8 +9,8 @@ import mil.tron.commonapi.entity.scratch.ScratchStorageAppUserPriv;
 import mil.tron.commonapi.entity.scratch.ScratchStorageUser;
 import org.modelmapper.ModelMapper;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.util.*;
 
 /**

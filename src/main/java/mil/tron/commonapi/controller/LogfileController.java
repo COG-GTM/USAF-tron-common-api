@@ -1,6 +1,6 @@
 package mil.tron.commonapi.controller;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;

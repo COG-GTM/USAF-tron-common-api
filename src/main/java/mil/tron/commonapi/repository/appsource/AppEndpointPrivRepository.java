@@ -6,7 +6,7 @@ import mil.tron.commonapi.entity.appsource.AppEndpointPriv;
 import mil.tron.commonapi.entity.appsource.AppSource;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import java.util.UUID;
 
 public interface AppEndpointPrivRepository extends JpaRepository<AppEndpointPriv, UUID> {
