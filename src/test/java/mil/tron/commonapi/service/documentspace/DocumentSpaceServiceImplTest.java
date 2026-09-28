@@ -22,6 +22,7 @@ import mil.tron.commonapi.entity.documentspace.DocumentSpace;
 import mil.tron.commonapi.entity.documentspace.DocumentSpaceDashboardMemberPrivilegeRow;
 import mil.tron.commonapi.entity.documentspace.DocumentSpaceFileSystemEntry;
 import mil.tron.commonapi.entity.documentspace.DocumentSpacePrivilege;
+import mil.tron.commonapi.exception.BadRequestException;
 import mil.tron.commonapi.exception.NotAuthorizedException;
 import mil.tron.commonapi.exception.RecordNotFoundException;
 import mil.tron.commonapi.repository.DashboardUserRepository;
@@ -964,6 +965,18 @@ class DocumentSpaceServiceImplTest {
 			assertEquals(1, exceptionStrings.size());
 
 			assertEquals("Duplicate email found on row 4", exceptionStrings.get(0));
+		}
+
+		@Test
+		void behavioralDifference_unterminatedQuoteIsRejectedAsBadRequestInsteadOfSilentlyDroppingTheTail() throws IOException {
+			Mockito.when(documentSpaceRepo.findById(documentSpaceId)).thenReturn(Optional.of(entity));
+
+			MockMultipartFile file = new MockMultipartFile("filename.txt", new FileInputStream("src/test/resources/dashboard-user-csv/unterminated-quote.csv"));
+
+			assertThatThrownBy(() -> documentService.batchAddDashboardUserToDocumentSpace(documentSpaceId, file))
+					.isInstanceOf(BadRequestException.class)
+					.hasMessage("Failed retrieving uploaded file");
+			Mockito.verify(documentSpaceRepo, Mockito.never()).save(Mockito.any());
 		}
 
 	}

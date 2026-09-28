@@ -176,6 +176,20 @@ wall-clock-dependent assertion that fails on `master` before any change here), p
 characterization tests and 8 new unit tests for the wording shim (`TronCommonErrorAttributesTest`,
 `LegacyErrorMessagesTest`). No pre-existing test changed outcome.
 
+### One behavioral difference outside the slice, accepted and pinned
+
+Liquibase 4.31 no longer ships its shaded `liquibase.util.csv.opencsv.CSVReader`, so
+`DocumentSpaceServiceImpl.batchAddDashboardUserToDocumentSpace` now reads with `com.opencsv:opencsv`.
+Both readers agree on every well-formed input compared (blank lines, short/long rows, quoted fields,
+doubled quotes, CRLF, embedded newlines, whitespace, empty file, header only). They differ on one
+malformed input: an unterminated quote. The shaded legacy reader returned the rows before the quote and
+silently discarded everything from the quote to end of file, so the upload reported success with the
+tail of the roster missing; opencsv 5 throws `CsvMalformedLineException`, which the existing
+`catch` turns into `BadRequestException("Failed retrieving uploaded file")` (HTTP 400, nothing added).
+The new behavior is pinned by
+`DocumentSpaceServiceImplTest.behavioralDifference_unterminatedQuoteIsRejectedAsBadRequestInsteadOfSilentlyDroppingTheTail`
+and listed in the PR as a program decision (keep the 400, or emulate the legacy silent drop).
+
 ## Out of scope
 
 `RankService.getRank(UUID)` is exercised only via `PersonService` and has no HTTP route; it is pinned
