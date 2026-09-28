@@ -33,7 +33,7 @@ import mil.tron.commonapi.service.fieldauth.EntityFieldAuthResponse;
 import mil.tron.commonapi.service.fieldauth.EntityFieldAuthService;
 import mil.tron.commonapi.service.utility.PersonUniqueChecksService;
 import mil.tron.commonapi.service.utility.ValidatorService;
-import org.assertj.core.util.Lists;
+import com.google.common.collect.Lists;
 import org.modelmapper.Conditions;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;

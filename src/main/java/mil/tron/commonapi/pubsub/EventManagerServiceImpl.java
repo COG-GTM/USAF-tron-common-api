@@ -13,7 +13,7 @@ import mil.tron.commonapi.repository.pubsub.PubSubLedgerRepository;
 import mil.tron.commonapi.security.AppClientPreAuthFilter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.assertj.core.util.Lists;
+import com.google.common.collect.Lists;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

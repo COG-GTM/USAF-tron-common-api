@@ -19,7 +19,7 @@ import mil.tron.commonapi.repository.AppClientUserRespository;
 import mil.tron.commonapi.repository.PrivilegeRepository;
 import mil.tron.commonapi.repository.documentspace.DocumentSpacePrivilegeRepository;
 import mil.tron.commonapi.service.DashboardUserService;
-import org.assertj.core.util.Lists;
+import com.google.common.collect.Lists;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 

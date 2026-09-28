@@ -43,7 +43,7 @@ public class LogfileController {
 				content = @Content(schema = @Schema(implementation = ExceptionResponse.class)))
 	})
 	@PreAuthorizeDashboardAdmin
-	@GetMapping
+	@GetMapping({"", "/"})
 	public ResponseEntity<Object> getLogfileInfo() {
 		return new ResponseEntity<>(service.getAllLogfileInfo(), HttpStatus.OK);
 	}

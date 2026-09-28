@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -44,9 +45,11 @@ public class PuckboardEtlController {
         return builder.build();
     }
 
-    @Autowired
-    @Qualifier("puckboardFetcher")
-    private RestTemplate restTemplate;
+    private final RestTemplate restTemplate;
+
+    public PuckboardEtlController(@Qualifier("puckboardFetcher") @Lazy RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
 
     @GetMapping("/test")
     public ResponseEntity<Object> testPuckboardComms(
