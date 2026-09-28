@@ -4,6 +4,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.web.error.ErrorAttributeOptions;
 import org.springframework.http.HttpMethod;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.security.authorization.AuthorizationDecision;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
@@ -51,6 +53,17 @@ class TronCommonErrorAttributesTest {
         assertThat(body.get("status")).isEqualTo(404);
         assertThat(body.get("error")).isEqualTo("Not Found");
         assertThat(body.get("reason")).isEqualTo("No message available");
+    }
+
+    @Test
+    void authorizationDenialKeepsLegacyAccessIsDeniedReason() {
+        Map<String, Object> body = attributesFor(403,
+                new AuthorizationDeniedException("Access Denied", new AuthorizationDecision(false)),
+                ErrorAttributeOptions.defaults().including(ErrorAttributeOptions.Include.MESSAGE));
+
+        assertThat(body.get("status")).isEqualTo(403);
+        assertThat(body.get("error")).isEqualTo("Forbidden");
+        assertThat(body.get("reason")).isEqualTo("Access is denied");
     }
 
     @Test
