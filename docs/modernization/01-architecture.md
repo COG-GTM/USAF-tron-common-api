@@ -168,7 +168,7 @@ sequenceDiagram
 
 | Evidence | Finding |
 |---|---|
-| `src/main/java/mil/tron/commonapi/pubsub/EventManagerServiceImpl.java:51-91` | Ledger row written **before** publish; ledger is the replay source (`SubscriberController` replay endpoints, `src/main/java/mil/tron/commonapi/controller/pubsub/SubscriberController.java:49-282`) |
+| `src/main/java/mil/tron/commonapi/pubsub/EventManagerServiceImpl.java:51-91` | Ledger row written **before** publish; ledger is the replay source (`SubscriberController` replay endpoints, `src/main/java/mil/tron/commonapi/controller/pubsub/SubscriberController.java:49-282`) — replay is read-only: callers fetch ledger rows; no webhook redelivery is triggered |
 | `src/main/java/mil/tron/commonapi/pubsub/EventPublisher.java:58-68,95-100,144-145,200-218` | `ConcurrentLinkedQueue` in memory (lost on restart), `@Async`, `@Scheduled(fixedDelayString)`, HMAC over the body with the subscriber's secret in header `${signature-header}` (`:55-56,216`), `RestTemplate` POST |
 | `src/main/resources/application.properties:109-116` | 50 ms delay, 5 s timeout, 1,000,000 max queue |
 | `src/main/java/mil/tron/commonapi/entity/pubsub/Subscriber.java`, `…/entity/pubsub/log/EventRequestLog.java:24-26` | Subscriber address/secret/event type; per-delivery log |
@@ -211,7 +211,7 @@ Confidence: High.
 | Domain data (people, orgs, app clients/sources, privileges, dashboard users, scratch JSON, document-space metadata, KPI/metrics, HTTP trace, pub/sub ledger + logs) | PostgreSQL (prod) / H2 (dev, test) via 28 entities | Yes (prod); in-memory for dev/test | `00-inventory.md` §4 | Schema is Liquibase-owned; **Liquibase changelog table history is state too** |
 | Schema history + seed reference data (ranks) | Liquibase `DATABASECHANGELOG` + CSV `loadData` | Yes | `src/main/resources/db/db.changelog-master.xml:8`, `db/changelog/diff-changelog-1.00.002.xml:11-17` | Checksums are computed by Liquibase 4.3.1; upgrading Liquibase changes checksum algorithm (4.x→4.2x/5.x) — validate before cut-over |
 | File contents | S3-compatible bucket `minio.bucket-name` | Yes | `DocumentSpaceConfig.java:22-23,31-32`, `application-production.properties:11` | Keys are derived from document-space ids — must not change |
-| Outbound webhook queue | JVM heap (`EventPublisher` queue) | **No** — lost on restart; ledger allows replay | `EventPublisher.java:58-68` | Any rolling restart drops queued events |
+| Outbound webhook queue | JVM heap (`EventPublisher` queue) | **No** — lost on restart; ledger rows survive and can be *pulled* by subscribers via the replay endpoints, but the service does not re-send them | `EventPublisher.java:58-68`, `SubscriberController.java:168-257` | Any rolling restart drops queued events |
 | App-source route table + dynamic MVC mappings | JVM (rebuilt at startup from config + DB) | No (derived) | `AppSourceEndpointsBuilder.java:66-118` | Rebuilt deterministically; safe |
 | Health snapshots per app source | JVM (`AtomicReference<Health>`) | No | `AppSourceHealthIndicator.java:150-185` | — |
 | Caches | Caffeine in JVM when `caching.enabled` | No | `CacheConfig.java` | — |
