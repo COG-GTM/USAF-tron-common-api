@@ -6,9 +6,9 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.io.IOException;
@@ -48,7 +48,7 @@ public class RankEndpointCharacterizationTest {
 
     private final HttpClient client = HttpClient.newHttpClient();
 
-    @LocalServerPort
+    @Value("${local.server.port}")
     private int port;
 
     private HttpResponse<String> get(String path) throws IOException, InterruptedException {
