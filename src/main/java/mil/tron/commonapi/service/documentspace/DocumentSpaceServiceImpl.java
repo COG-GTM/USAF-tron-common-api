@@ -153,7 +153,6 @@ public class DocumentSpaceServiceImpl implements DocumentSpaceService {
 		DocumentSpace documentSpace = getDocumentSpaceOrElseThrow(documentSpaceId);
 
 		documentSpaceFileSystemService.deleteFolder(documentSpaceId, DocumentSpaceFileSystemServiceImpl.PATH_SEP);
-		documentSpaceFileSystemService.deleteAllEntries(documentSpaceId);
 
 		unsetDashboardUsersDefaultDocumentSpace(documentSpace);
 		
@@ -1223,7 +1222,7 @@ public class DocumentSpaceServiceImpl implements DocumentSpaceService {
 					}
 				}
 			}
-			} catch (IOException | CsvException e) {
+		} catch (IOException | CsvException e) {
 			throw new BadRequestException("Failed retrieving uploaded file");
 		}
 
