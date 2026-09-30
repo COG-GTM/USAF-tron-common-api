@@ -1,0 +1,18 @@
+// Two ways to make every developer get the sf-standards plugin. Examples only; nothing here is active.
+// Both need Devin Cloud. On a Devin Local only deployment (FedRAMP), use system-level folders instead:
+// see mdm-install.sh next to this file, and step 8 of demo-basics/README.md.
+
+// 1. One repository: add this to that repository's .devin/config.json.
+//    Everyone who opens the repository gets the plugin. Pin a commit sha so updates go through review.
+{
+  "requiredPlugins": [
+    { "source": "git-subdir", "url": "https://github.com/COG-GTM/USAF-tron-common-api.git",
+      "path": "demo-basics/plugin/sf-standards", "sha": "<commit sha>" }
+  ]
+}
+
+// 2. Every repository in the organization: in the Devin web app, an admin opens Customize (sidebar)
+//    -> Plugins tab -> Organization (or Enterprise) scope -> Plugin settings (gear) -> Edit manifest,
+//    and adds the same entry to "requiredPlugins". Installing from Browse marketplace at that scope does the same.
+//    The Organization and Enterprise scope tabs only appear for users with org or enterprise settings access.
+//    A repository or a developer cannot remove a plugin required there.

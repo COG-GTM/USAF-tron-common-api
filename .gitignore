@@ -42,3 +42,6 @@ logs/
 ### NPM ###
 node_modules/
 package-lock.json
+
+# Local-only demo file created by demo-basics/stage.sh
+.env
