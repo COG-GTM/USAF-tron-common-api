@@ -28,9 +28,8 @@ case "${1:-status}" in
     rm -f .devin/rules/software-factory-standards.md .devin/config.json .env
     rm -rf .devin/skills/new-endpoint
     rmdir .devin/rules .devin/skills .devin 2>/dev/null || true
-    rm -f src/main/java/mil/tron/commonapi/controller/ranks/BranchController.java \
-          src/test/java/mil/tron/commonapi/controller/ranks/BranchControllerTests.java
     git checkout -- src
+    git clean -fq -- src
     echo "Back to the starting point. Untracked files left for you to review:"
     git status --short
     ;;

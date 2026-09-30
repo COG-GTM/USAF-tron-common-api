@@ -197,7 +197,7 @@ git status --short
 ```bash
 bash demo-basics/stage.sh reset
 ```
-Removes the staged layers, the fake `.env`, the new branches endpoint and its test, and restores `src/` to the committed version. **This discards any code changes under `src/`,** which is what you want between demo runs. Then start a new session.
+Removes the staged layers and the fake `.env`, restores `src/` to the committed version and deletes any new files the agent created under `src/`. **This discards all code changes under `src/`,** which is what you want between demo runs. Anything it lists afterwards (for example a file the agent saved under `.devin/`) is outside `src/`; check it before deleting. Then start a new session.
 
 ## If something goes wrong
 
