@@ -3,11 +3,12 @@
 set -euo pipefail
 cd "$(git rev-parse --show-toplevel)"
 L=demo-basics/layers
+P=demo-basics/plugin/sf-standards
 
 case "${1:-status}" in
   standards)
     mkdir -p .devin/rules
-    cp "$L/software-factory-standards.md" .devin/rules/software-factory-standards.md
+    cp "$P/rules/software-factory-standards.md" .devin/rules/software-factory-standards.md
     echo "Added .devin/rules/software-factory-standards.md (always on). Start a new session to load it."
     ;;
   secret)
@@ -21,7 +22,7 @@ case "${1:-status}" in
     ;;
   skill)
     mkdir -p .devin/skills/new-endpoint
-    cp "$L/skills/new-endpoint/SKILL.md" .devin/skills/new-endpoint/SKILL.md
+    cp "$P/skills/new-endpoint/SKILL.md" .devin/skills/new-endpoint/SKILL.md
     echo "Added .devin/skills/new-endpoint/SKILL.md. Type /new-endpoint in a new session."
     ;;
   reset)

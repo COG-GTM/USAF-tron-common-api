@@ -175,20 +175,39 @@ Start a new session in **Plan** mode and type:
 - "The description is always loaded, so it knows the skill exists. The seven steps load only when the skill is used, so they cost nothing the rest of the time."
 - "This is how you split a long playbook: a short standards file that is always on, and procedures as skills."
 
-## 8. Sharing (2 min)
+## 8. Sharing (4 min)
 
 ```bash
 git status --short
 ```
-**Say:**
-- "Everything we added is a text file. Commit it and every developer who pulls the repository gets the same standards, guardrails and skills. Changes go through normal code review."
-- "Three levels:
-  - **Repository**: `.devin/` and `AGENTS.md`, as today.
-  - **Just me**: the same files under `~/.devin/` on my machine, for every project I open.
-  - **Whole organization**: a plugin that bundles rules, skills and permissions, which an admin can make required. Confirm with your admin what is enabled on your deployment."
-- "Start with one repository and one short standards file. Grow it when you see the agent repeat a mistake."
+**Say:** "Everything we added is a text file. Commit it and every developer who pulls this repository gets the same standards, guardrails and skill. Changes go through normal code review."
+
+**Then the question Tim will ask: "How do I get this into all 40 repositories without copying it 40 times?"** Open the plugin folder:
+
+```
+demo-basics/plugin/sf-standards/
+├── .devin-plugin/plugin.json                  # name, version, description
+├── rules/software-factory-standards.md        # the rule from step 3
+└── skills/new-endpoint/SKILL.md               # the skill from step 7
+```
+
+**Say:** "These are the same two files. The staging script copied them from here all along. A plugin is just a folder in a Git repository with a small manifest. Version it in one place, and every repository that uses it gets the update."
+
+Open `demo-basics/plugin/how-to-require-it.jsonc`:
+- **One repository:** add `requiredPlugins` to that repository's `.devin/config.json`, pinned to a commit so updates are reviewed.
+- **Whole organization:** an admin adds the same entry to the organization's managed plugin list. Higher levels win, so a repository or developer cannot remove a plugin the organization requires.
+- A plugin's skills get its name as a prefix, for example `/sf-standards:new-endpoint`, so they never clash with a repository's own skills.
+
+**The three levels, as a summary:**
+- **Repository:** `.devin/`, `.agents/skills/` and `AGENTS.md`, reviewed like code.
+- **Just me:** `~/.config/devin/AGENTS.md` and `~/.config/devin/skills/` on my machine, for every project I open.
+- **Whole organization:** a required plugin. Confirm with your admin what is enabled on your deployment.
+
+"Start with one repository and one short standards file. Move it into a plugin when a second team wants it."
 
 **Tim's question, "Where do I start?":** Ask mode on code you already know. Ask it to explain something, check the answer against the file, then try Plan mode on a small ticket.
+
+**Optional, live install (needs the Devin CLI; not tested in rehearsal):** `devin plugins install --local ./demo-basics/plugin/sf-standards`, then start a new session and type `/sf-standards:new-endpoint`. If you do this, run `bash demo-basics/stage.sh reset` first so the repository copies are gone and only the plugin supplies them.
 
 ---
 

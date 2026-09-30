@@ -1,0 +1,13 @@
+// Two ways to make every developer get the sf-standards plugin. Examples only; nothing here is active.
+
+// 1. One repository: add this to that repository's .devin/config.json.
+//    Everyone who opens the repository gets the plugin. Pin a commit sha so updates go through review.
+{
+  "requiredPlugins": [
+    { "source": "git-subdir", "url": "https://github.com/COG-GTM/USAF-tron-common-api.git",
+      "path": "demo-basics/plugin/sf-standards", "sha": "<commit sha>" }
+  ]
+}
+
+// 2. Every repository in the organization: an admin puts the same entry in the organization's
+//    managed plugin manifest in the Devin web app. A repository or a developer cannot remove it.
