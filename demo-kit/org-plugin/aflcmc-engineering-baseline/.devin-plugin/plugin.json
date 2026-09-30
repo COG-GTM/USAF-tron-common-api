@@ -1,0 +1,5 @@
+{
+  "name": "aflcmc-engineering-baseline",
+  "version": "0.1.0",
+  "description": "Demo org baseline: always-on engineering rules, a control-evidence skill, and a read-only STIG reviewer subagent, shared across every repository."
+}

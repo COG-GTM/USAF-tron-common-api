@@ -1,0 +1,16 @@
+{
+  "deny": [
+    "Read(~/.ssh/**)",
+    "Read(~/.aws/**)",
+    "Read(**/*.pem)",
+    "Exec(sudo)",
+    "Exec(git push --force)",
+    "mcp__*__delete_*",
+    "mcp__*__close_*"
+  ],
+  "ask": [
+    "Exec(git push)",
+    "Write(**/db/changelog/**)"
+  ],
+  "allow": []
+}

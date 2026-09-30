@@ -42,3 +42,9 @@ logs/
 ### NPM ###
 node_modules/
 package-lock.json
+
+### Devin (personal and generated) ###
+AGENTS.local.md
+.devin/*.local.json
+.devin/audit/
+docs/agent-plans/*.local.md

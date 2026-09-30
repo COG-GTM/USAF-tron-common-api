@@ -1,0 +1,8 @@
+// Repo-level alternative: add these keys to .devin/config.json so every checkout of this
+// repository installs the baseline. Pin a sha in production; a ref floats.
+{
+  "requiredPlugins": [
+    { "source": "git-subdir", "url": "https://github.com/COG-GTM/USAF-tron-common-api.git",
+      "path": "demo-kit/org-plugin/aflcmc-engineering-baseline", "sha": "<commit sha>" }
+  ]
+}

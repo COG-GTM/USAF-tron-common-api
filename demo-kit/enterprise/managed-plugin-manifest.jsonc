@@ -1,0 +1,10 @@
+// Enterprise-level managed manifest (set by an enterprise admin in the web app).
+// Lockdown: forbid every plugin except the ones listed here. No org, repo, or user can widen it.
+{
+  "requiredPlugins": [
+    { "source": "git-subdir", "url": "https://github.com/COG-GTM/USAF-tron-common-api.git",
+      "path": "demo-kit/org-plugin/aflcmc-engineering-baseline", "ref": "demo/aflcmc-201" }
+  ],
+  "optionalPlugins": [],
+  "forbiddenPlugins": ["*"]
+}
