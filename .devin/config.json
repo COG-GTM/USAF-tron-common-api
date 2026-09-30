@@ -1,0 +1,47 @@
+{
+  "permissions": {
+    "allow": [
+      "read",
+      "grep",
+      "glob",
+      "Exec(./mvnw -q test)",
+      "Exec(./mvnw test)",
+      "Exec(mvn -q test)",
+      "Exec(mvn test)",
+      "Exec(git status)",
+      "Exec(git diff)",
+      "Exec(git log)",
+      "Exec(python3 demo-kit/)",
+      "mcp__changeboard__list_tickets",
+      "mcp__changeboard__get_ticket",
+      "mcp__changeboard__get_control"
+    ],
+    "ask": [
+      "Write(src/main/resources/db/**)",
+      "Write(src/main/java/mil/tron/commonapi/security/**)",
+      "Write(src/main/java/mil/tron/commonapi/annotation/security/**)",
+      "Write(pom.xml)",
+      "Exec(git push)",
+      "Exec(git commit)",
+      "mcp__changeboard__add_ticket_comment",
+      "Exec(curl)"
+    ],
+    "deny": [
+      "Read(**/*.pem)",
+      "Read(**/*.p12)",
+      "Read(**/*.jks)",
+      "Read(**/.env*)",
+      "Read(~/.ssh/**)",
+      "Read(~/.aws/**)",
+      "Write(.env*)",
+      "Write(src/main/resources/application-production.properties)",
+      "Write(.devin/config.json)",
+      "Write(.devin/hooks.v1.json)",
+      "Exec(sudo)",
+      "Exec(rm -rf)",
+      "Exec(git push --force)",
+      "Exec(wget)",
+      "mcp__changeboard__close_ticket"
+    ]
+  }
+}

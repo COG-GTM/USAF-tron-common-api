@@ -1,0 +1,31 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "com.example/changeboard",
+  "title": "Change board",
+  "description": "Read change-board tickets and control summaries; append comments. Synthetic data.",
+  "version": "1.0.0",
+  "repository": {
+    "url": "https://github.example.com/tools/mcp-changeboard",
+    "source": "github"
+  },
+  "icons": [
+    {
+      "src": "https://changeboard.example.com/favicon.png",
+      "mimeType": "image/png"
+    }
+  ],
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://mcp.example.com/changeboard/mcp",
+      "headers": [
+        {
+          "name": "Authorization",
+          "description": "Change-board token (Bearer)",
+          "isRequired": true,
+          "isSecret": true
+        }
+      ]
+    }
+  ]
+}
