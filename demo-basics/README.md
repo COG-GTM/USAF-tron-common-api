@@ -244,9 +244,18 @@ Open `demo-basics/plugin/how-to-require-it.jsonc`:
 **The three levels, as a summary:**
 - **Repository:** `.devin/`, `.agents/skills/` and `AGENTS.md`, reviewed like code.
 - **Just me:** `~/.config/devin/AGENTS.md` and `~/.config/devin/skills/` on my machine, for every project I open. That is where `/standup` from step 7b lives.
-- **Whole organization:** a required plugin. Confirm with your admin what is enabled on your deployment.
+- **Whole organization:** a required plugin where Devin Cloud is available, or system-level folders pushed by IT on Devin Local only deployments (below).
 
 "Start with one repository and one short standards file. Move it into a plugin when a second team wants it."
+
+**On a Devin Local only deployment (the FedRAMP High authorized path):** plugins and the team marketplace need Devin Cloud, so the org-wide routes are different. The files are the same; only the delivery changes.
+- **Enforced, by IT:** system-level rules and skills. IT pushes the files with their device management (MDM) tool into admin-only folders. They load in every workspace, show with a "System" label, and users cannot change or delete them. `demo-basics/plugin/mdm-install.sh` is an example of what IT would push.
+  - macOS: `/Library/Application Support/Devin/rules/*.md` and `/Library/Application Support/Devin/skills/<name>/SKILL.md`
+  - Linux: `/etc/devin/rules/`, `/etc/devin/skills/`. Windows: `C:\ProgramData\Devin\rules\`, `C:\ProgramData\Devin\skills\`
+- **Opt-in, for developers:** `npx skills add <your git URL for the skills repo> -a devin` copies skills into a repository's `.devin/skills/`, or add `-g` for the developer's own `~/.config/devin/skills/`. It works from any Git host, including an internal one; `npx skills update` pulls new versions. It is not enforced, so use it for recommended skills, not policy.
+- The subagent from step 5 has no documented system-level folder, so ship it in each repository's `.devin/agents/`.
+
+**Say:** "On your deployment, IT owns the org-wide layer the same way they own other device policy: they push the standards to every laptop, and nobody can switch them off. Teams add their own on top in the repository."
 
 **Tim's question, "Where do I start?":** Ask mode on code you already know. Ask it to explain something, check the answer against the file, then try Plan mode on a small ticket.
 

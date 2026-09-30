@@ -1,4 +1,6 @@
 // Two ways to make every developer get the sf-standards plugin. Examples only; nothing here is active.
+// Both need Devin Cloud. On a Devin Local only deployment (FedRAMP), use system-level folders instead:
+// see mdm-install.sh next to this file, and step 8 of demo-basics/README.md.
 
 // 1. One repository: add this to that repository's .devin/config.json.
 //    Everyone who opens the repository gets the plugin. Pin a commit sha so updates go through review.
