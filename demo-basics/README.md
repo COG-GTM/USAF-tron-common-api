@@ -1,6 +1,6 @@
 # AFLCMC 201: agents from first principles
 
-A 35-minute live demo for developers who have not used an AI agent before. It uses one small, real endpoint in this repository and adds one idea at a time. Each layer is a file you can open, so nothing is hidden.
+A 37-minute live demo for developers who have not used an AI agent before. It uses one small, real endpoint in this repository and adds one idea at a time. Each layer is a file you can open, so nothing is hidden.
 
 | # | Layer | The one idea | Minutes |
 |---|-------|--------------|---------|
@@ -10,7 +10,7 @@ A 35-minute live demo for developers who have not used an AI agent before. It us
 | 4 | Plan, then build | Plan first, approve each edit | 6 |
 | 5 | Checking its work | Read the diff, run the test, and have a second agent with fresh eyes review it | 5 |
 | 6 | Guardrails | Some things it is never allowed to do, whatever it is told | 3 |
-| 7 | Skills | Save a good procedure once; anyone reruns it with one command | 3 |
+| 7 | Skills | Save a good procedure once; anyone reruns it with one command. Team skills live in the repo, personal ones in your home folder | 5 |
 | 8 | Sharing | Repo, user, org: the same files at three levels, packaged as a plugin | 4 |
 
 Everything is synthetic and offline. The only secret in the demo is a fake `.env` file that says it is fake.
@@ -193,6 +193,30 @@ Start a new session in **Plan** mode and type:
 - "The description is always loaded, so it knows the skill exists. The seven steps load only when the skill is used, so they cost nothing the rest of the time."
 - "This is how you split a long playbook: a short standards file that is always on, and procedures as skills."
 
+**7b. Your own skills.** `/new-endpoint` is the team's: it lives in the repository, so everyone who pulls gets it. You can also keep skills that are just yours.
+
+```bash
+bash demo-basics/stage.sh my-skill
+```
+Open `~/.config/devin/skills/standup/SKILL.md` (in the terminal: `cat ~/.config/devin/skills/standup/SKILL.md`). Same format as the team skill: a name, a one-line description, and four steps. It also has its own small permission list: it may run `git log`, `git status` and `git diff` without asking, and it may never edit.
+
+Start a new session and type `/` to open the skill list. Both skills are there: `new-endpoint` from the repository and `standup` from your home folder. Then type:
+> /standup
+
+**Expect:** it runs the three Git commands without asking, then replies with Done / In progress / Blockers. "In progress" is the branches endpoint from step 4, because it is not committed.
+
+Then in the terminal:
+```bash
+git status --short
+```
+**Point out:** `standup` is not in the list. It is not in the repository, so it is never committed and nobody else gets it. It is on this laptop, in every project I open.
+
+**Say:**
+- "Where a skill lives decides who gets it. In the repository: the team. In my home folder: just me, in every project. In a plugin: the whole organization. That is the next step."
+- "A good personal skill that a teammate asks for is a candidate to move into the repository or the plugin."
+
+Optional: right-click the session and choose **Open customizations** to show where each loaded skill comes from.
+
 ## 8. Sharing (4 min)
 
 ```bash
@@ -219,7 +243,7 @@ Open `demo-basics/plugin/how-to-require-it.jsonc`:
 
 **The three levels, as a summary:**
 - **Repository:** `.devin/`, `.agents/skills/` and `AGENTS.md`, reviewed like code.
-- **Just me:** `~/.config/devin/AGENTS.md` and `~/.config/devin/skills/` on my machine, for every project I open.
+- **Just me:** `~/.config/devin/AGENTS.md` and `~/.config/devin/skills/` on my machine, for every project I open. That is where `/standup` from step 7b lives.
 - **Whole organization:** a required plugin. Confirm with your admin what is enabled on your deployment.
 
 "Start with one repository and one short standards file. Move it into a plugin when a second team wants it."
@@ -235,7 +259,7 @@ Open `demo-basics/plugin/how-to-require-it.jsonc`:
 ```bash
 bash demo-basics/stage.sh reset
 ```
-Removes the staged layers and the fake `.env`, restores `src/` to the committed version and deletes any new files the agent created under `src/`. **This discards all code changes under `src/`,** which is what you want between demo runs. Anything it lists afterwards (for example a file the agent saved under `.devin/`) is outside `src/`; check it before deleting. Then run `bash demo-basics/stage.sh reviewer` again to preload the step 5 subagent, and start a new session.
+Removes the staged layers (including the step 7b `standup` skill in your home folder, if it is the demo copy) and the fake `.env`, restores `src/` to the committed version and deletes any new files the agent created under `src/`. **This discards all code changes under `src/`,** which is what you want between demo runs. Anything it lists afterwards (for example a file the agent saved under `.devin/`) is outside `src/`; check it before deleting. Then run `bash demo-basics/stage.sh reviewer` again to preload the step 5 subagent, and start a new session.
 
 ## If something goes wrong
 
@@ -246,4 +270,5 @@ Removes the staged layers and the fake `.env`, restores `src/` to the committed 
 | The agent is slow | Narrate the tool calls while you wait: that is the loop from step 1. |
 | Step 4 goes sideways | `git apply demo-basics/fallback/branches-endpoint.patch` |
 | The reviewer in step 5 does not run | Turn on Subagents (Preview) in Devin Settings, check `stage.sh status` shows `standards-reviewer.md` as `on`, and start a new session. Or ask the main agent for the same pass/fail review. |
+| `/standup` is not in the skill list in 7b | Run `bash demo-basics/stage.sh status` (the `~/.config/devin/skills/standup` line should be `on`) and start a new session. Fallback: `cat` the file and say "this loads in every project on my laptop". |
 | The deny in step 6 does not trigger | Run `bash demo-basics/stage.sh status` (config.json should be `on`) and start a new session. Turn sandbox off and use Normal mode: in sandbox mode shell commands run without prompting. Use the production-properties prompt; the `.env` and push prompts are usually stopped earlier by `.gitignore` and SF-GIT-1. |
