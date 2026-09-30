@@ -29,7 +29,7 @@ bash demo-basics/stage.sh status                   # every layer should say "off
 ```
 
 - Open the folder in Devin Desktop and start a **Devin Local** session.
-- Use **Normal** permission mode, so the audience sees every approval prompt. Do not use Bypass.
+- Use **Normal** permission mode with sandbox **off**, so the audience sees every approval prompt. Do not use Bypass or sandbox mode.
 - Make the chat font large. Keep a terminal open in the repository folder for the `stage.sh` commands.
 - Open `src/main/java/mil/tron/commonapi/controller/ranks/RankController.java` in an editor tab. It is 96 lines; you will point at it.
 
