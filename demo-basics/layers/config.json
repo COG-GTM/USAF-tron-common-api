@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "read",
+      "grep",
+      "glob",
+      "Exec(git status)",
+      "Exec(git diff)",
+      "Exec(./mvnw)",
+      "Exec(mvn)"
+    ],
+    "ask": [
+      "Write(pom.xml)",
+      "Exec(git commit)"
+    ],
+    "deny": [
+      "Read(**/.env*)",
+      "Read(~/.ssh/**)",
+      "Read(~/.aws/**)",
+      "Write(.env*)",
+      "Exec(git push)",
+      "Exec(rm -rf)",
+      "Exec(sudo)"
+    ]
+  }
+}
