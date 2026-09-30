@@ -238,7 +238,7 @@ demo-basics/plugin/sf-standards/
 
 Open `demo-basics/plugin/how-to-require-it.jsonc`:
 - **One repository:** add `requiredPlugins` to that repository's `.devin/config.json`, pinned to a commit so updates are reviewed.
-- **Whole organization:** an admin adds the same entry to the organization's managed plugin list. Higher levels win, so a repository or developer cannot remove a plugin the organization requires.
+- **Whole organization:** in the Devin web app, an admin opens **Customize → Plugins**, picks the **Organization** (or **Enterprise**) scope, and adds the same entry under **Plugin settings → Edit manifest**. Those scope tabs only show for admins, so a regular account sees only **Personal**. Higher levels win, so a repository or developer cannot remove a plugin the organization requires.
 - A plugin's skills get its name as a prefix, for example `/sf-standards:new-endpoint`, so they never clash with a repository's own skills.
 
 **The three levels, as a summary:**

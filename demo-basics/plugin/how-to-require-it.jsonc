@@ -9,5 +9,8 @@
   ]
 }
 
-// 2. Every repository in the organization: an admin puts the same entry in the organization's
-//    managed plugin manifest in the Devin web app. A repository or a developer cannot remove it.
+// 2. Every repository in the organization: in the Devin web app, an admin opens Customize (sidebar)
+//    -> Plugins tab -> Organization (or Enterprise) scope -> Plugin settings (gear) -> Edit manifest,
+//    and adds the same entry to "requiredPlugins". Installing from Browse marketplace at that scope does the same.
+//    The Organization and Enterprise scope tabs only appear for users with org or enterprise settings access.
+//    A repository or a developer cannot remove a plugin required there.
