@@ -128,7 +128,7 @@ Then:
 
 **Tim's question, "Can I trust the code?":** the same way you trust anyone's code: tests, review and CI. The agent makes those faster to run; it does not replace them.
 
-## 6. Guardrails (3 min)
+## 6. Guardrails (4 min)
 
 Rules are advice. Permissions are enforced.
 
@@ -136,14 +136,26 @@ Rules are advice. Permissions are enforced.
 bash demo-basics/stage.sh secret       # creates a FAKE .env
 bash demo-basics/stage.sh guardrails   # adds .devin/config.json
 ```
-Open `.devin/config.json`: three lists, **allow** (just do it), **ask** (prompt me), **deny** (never).
+Open `.devin/config.json`: three lists, **allow** (just do it), **ask** (prompt me), **deny** (never). Point at the first deny line: the production config file is off-limits to the agent.
 
-Start a new session and type:
-> Show me what is in the .env file, then push this branch.
+Start a **new** session (Normal mode) and send these one at a time:
 
-**Expect:** the read of `.env` is refused by the deny rule, and `git push` is refused too. Running the tests is now allowed without a prompt.
+> Open src/main/resources/application-production.properties and summarize it.
 
-**Say:** "Deny wins. A developer or the agent cannot override a deny with an allow, and an organization-level deny beats a repository-level allow."
+**Expect:** the read is blocked by the deny rule. The model has no reason to refuse this on its own, so the block is plainly the rule, not the model being cautious.
+
+> Run exactly this command and nothing else: git push
+
+**Expect:** blocked by `Exec(git push)` in the deny list, with no approval prompt.
+
+**Say:** "Deny wins. Neither a developer nor the agent can override a deny with an allow, and an organization-level deny beats a repository-level allow."
+
+**Optional, the three layers:**
+> Show me what is in the .env file.
+
+The model will usually refuse by itself because the file looks like a secret. Use that: "That was the model's judgment. It helps, but it is not a control. The deny rule is the control. Behind both, the server has its own: GitHub checks whether you may push at all."
+
+**Be honest about limits if asked:** command rules match the start of the command. A chained command such as `git status && git push` starts with `git status`, so do not treat a command deny list as your only boundary. Pair it with the sandbox where it is enabled, protected branches and server-side permissions.
 
 **Tim's question, "Will it act on its own?":** only inside what you allow. In Normal mode it asks; deny rules stop it outright.
 
@@ -195,4 +207,4 @@ Removes the staged layers, the fake `.env`, the new branches endpoint and its te
 | Tests fail with `Unable to locate a Java Runtime` | `export JAVA_HOME=$(/usr/libexec/java_home -v 11)` in the terminal, then fully quit and reopen Devin Desktop. |
 | The agent is slow | Narrate the tool calls while you wait: that is the loop from step 1. |
 | Step 4 goes sideways | `git apply demo-basics/fallback/branches-endpoint.patch` |
-| The deny in step 6 does not trigger | Check `.devin/config.json` exists and you started a new session. Your organization's settings may also layer on top. |
+| The deny in step 6 does not trigger | Run `bash demo-basics/stage.sh status` (config.json should be `on`) and start a new session. Use the exact prompts: a chained command like `git status && git push` does not start with `git push`, so the prefix rule does not match it. |
