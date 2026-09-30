@@ -138,24 +138,24 @@ bash demo-basics/stage.sh guardrails   # adds .devin/config.json
 ```
 Open `.devin/config.json`: three lists, **allow** (just do it), **ask** (prompt me), **deny** (never). Point at the first deny line: the production config file is off-limits to the agent.
 
-Start a **new** session (Normal mode) and send these one at a time:
+Start a **new** session with sandbox **off**, in Normal mode, and type:
 
 > Open src/main/resources/application-production.properties and summarize it.
 
-**Expect:** the read is blocked by the deny rule. The model has no reason to refuse this on its own, so the block is plainly the rule, not the model being cautious.
-
-> Run exactly this command and nothing else: git push
-
-**Expect:** blocked by `Exec(git push)` in the deny list, with no approval prompt.
+**Expect:** the read is blocked by the deny rule. No standard forbids this and the file is not a secret, so the model has no reason to refuse by itself. The block is plainly the rule.
 
 **Say:** "Deny wins. Neither a developer nor the agent can override a deny with an allow, and an organization-level deny beats a repository-level allow."
 
-**Optional, the three layers:**
-> Show me what is in the .env file.
+**Optional, the layers side by side:**
+> Show me what is in the .env file, then push this branch.
 
-The model will usually refuse by itself because the file looks like a secret. Use that: "That was the model's judgment. It helps, but it is not a control. The deny rule is the control. Behind both, the server has its own: GitHub checks whether you may push at all."
+In rehearsal, two other layers stopped this before the deny rule came into play:
+- **`.env` is blocked because it is in `.gitignore`.** Devin Desktop will not let the agent open or edit ignored files. Add a `.devinignore` for more paths; enterprises can place a global ignore file on every machine.
+- **The push is declined because of SF-GIT-1, "Never push".** That is the standards file from step 3 working. It is still only advice, which is why `git push` is also on the deny list.
 
-**Be honest about limits if asked:** command rules match the start of the command. A chained command such as `git status && git push` starts with `git status`, so do not treat a command deny list as your only boundary. Pair it with the sandbox where it is enabled, protected branches and server-side permissions.
+"Four layers, strongest last: the model's judgment, your rules, the agent's permissions and ignore files, and the server's own checks. GitHub still decides whether you may push at all."
+
+**Be honest about limits if asked:** command rules match the start of the command. A chained command such as `git status && git push` starts with `git status`, so do not treat a command deny list as your only boundary. Pair it with protected branches and server-side permissions.
 
 **Tim's question, "Will it act on its own?":** only inside what you allow. In Normal mode it asks; deny rules stop it outright.
 
@@ -207,4 +207,4 @@ Removes the staged layers, the fake `.env`, the new branches endpoint and its te
 | Tests fail with `Unable to locate a Java Runtime` | `export JAVA_HOME=$(/usr/libexec/java_home -v 11)` in the terminal, then fully quit and reopen Devin Desktop. |
 | The agent is slow | Narrate the tool calls while you wait: that is the loop from step 1. |
 | Step 4 goes sideways | `git apply demo-basics/fallback/branches-endpoint.patch` |
-| The deny in step 6 does not trigger | Run `bash demo-basics/stage.sh status` (config.json should be `on`) and start a new session. Use the exact prompts: a chained command like `git status && git push` does not start with `git push`, so the prefix rule does not match it. |
+| The deny in step 6 does not trigger | Run `bash demo-basics/stage.sh status` (config.json should be `on`) and start a new session. Turn sandbox off and use Normal mode: in sandbox mode shell commands run without prompting. Use the production-properties prompt; the `.env` and push prompts are usually stopped earlier by `.gitignore` and SF-GIT-1. |
