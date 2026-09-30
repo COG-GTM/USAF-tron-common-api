@@ -1,6 +1,6 @@
 # AFLCMC 201: agents from first principles
 
-A 30-minute live demo for developers who have not used an AI agent before. It uses one small, real endpoint in this repository and adds one idea at a time. Each layer is a file you can open, so nothing is hidden.
+A 35-minute live demo for developers who have not used an AI agent before. It uses one small, real endpoint in this repository and adds one idea at a time. Each layer is a file you can open, so nothing is hidden.
 
 | # | Layer | The one idea | Minutes |
 |---|-------|--------------|---------|
@@ -8,14 +8,14 @@ A 30-minute live demo for developers who have not used an AI agent before. It us
 | 2 | Reading code | It reads the real files, and you ask where each answer came from | 4 |
 | 3 | Standards | Write the standard once in a file; every session loads it | 5 |
 | 4 | Plan, then build | Plan first, approve each edit | 6 |
-| 5 | Checking its work | Read the diff, run the test, ask it to check the standards | 4 |
+| 5 | Checking its work | Read the diff, run the test, and have a second agent with fresh eyes review it | 5 |
 | 6 | Guardrails | Some things it is never allowed to do, whatever it is told | 3 |
 | 7 | Skills | Save a good procedure once; anyone reruns it with one command | 3 |
-| 8 | Sharing | Repo, user, org: the same files at three levels | 2 |
+| 8 | Sharing | Repo, user, org: the same files at three levels, packaged as a plugin | 4 |
 
 Everything is synthetic and offline. The only secret in the demo is a fake `.env` file that says it is fake.
 
-The deeper demo (MCP, hooks, subagents, prompt injection, org plugins) is on the `demo/aflcmc-201` branch. Use it for follow-up questions or a 301.
+The deeper demo (MCP, hooks, parallel subagents, prompt injection, enterprise plugin lockdown) is on the `demo/aflcmc-201` branch. Use it for follow-up questions or a 301.
 
 ## Before the room fills (10 minutes)
 
@@ -26,9 +26,11 @@ git checkout demo/aflcmc-201-basics
 export JAVA_HOME=$(/usr/libexec/java_home -v 11)   # macOS
 ./mvnw -q '-Dtest=RankControllerTests*' test       # warms the Maven cache, prints nothing on success
 bash demo-basics/stage.sh status                   # every layer should say "off"
+bash demo-basics/stage.sh reviewer                 # preload the step 5 subagent; revealed in step 5
 ```
 
 - Open the folder in Devin Desktop and start a **Devin Local** session.
+- Turn on **Subagents (Preview)** in Devin Settings, or step 5's reviewer cannot run.
 - Use **Normal** permission mode with sandbox **off**, so the audience sees every approval prompt. Do not use Bypass or sandbox mode.
 - Make the chat font large. Keep a terminal open in the repository folder for the `stage.sh` commands.
 - Open `src/main/java/mil/tron/commonapi/controller/ranks/RankController.java` in an editor tab. It is 96 lines; you will point at it.
@@ -112,15 +114,31 @@ git apply demo-basics/fallback/branches-endpoint.patch
 ```
 That is the same change, already tested.
 
-## 5. Checking its work (4 min)
+## 5. Checking its work (5 min)
 
 **Type:**
 > Show me git diff, then run only the tests for this change and for RankController.
 
 **Expect:** the diff of the new files, then `./mvnw -q '-Dtest=RankControllerTests*,BranchControllerTests' test` (or similar) passing: 9 tests. The quotes matter in zsh, and the `*` picks up the nested test classes. The test for `/v1/branches` returning 404 is SF-API-1 checked by code, not by hope.
 
-Then:
-> Review your change against the software factory standards. For each standard say pass or fail, with file and line.
+**5b. A second pair of eyes: a subagent.** Open `.devin/agents/standards-reviewer.md` (you staged it before the room filled). It is 20 lines: a name, a one-line description, a list of tools it may use (`read`, `grep`, `glob`: no editing, no commands), and its instructions.
+
+**Type:**
+> Use the standards-reviewer subagent to review the new branches endpoint and its test. Report what it finds.
+
+**Expect:** the main agent starts a subagent, which works on its own and returns a pass/fail line per SF-* standard with file and line, and a verdict. The main chat shows only its summary.
+
+**Say:**
+- "A subagent is a second agent the main one hands a job to. It starts with an empty context, so it has not seen our conversation and does not know how the code was written. It judges only the files, like a reviewer who wasn't in the room."
+- "This one can only read. Its profile lists three tools; it cannot edit or run anything."
+- "Its reading stays in its own context. Only the summary comes back, so the main conversation stays short and focused."
+- "It is also just a text file, so it can be shared the same way as everything else, as step 8 shows."
+
+**If asked "why not just ask the same agent to check itself?":** you can, and it helps, but it is marking its own homework with everything it already believes in context. A fresh reviewer with a narrow job and read-only tools is the same idea as a separate code reviewer.
+
+**If asked "what model does it use?":** by default, the one your admin sets for subagents. A profile can pin its own model with a `model:` line. Worth confirming what your deployment allows.
+
+**If the subagent does not start:** check that Subagents (Preview) is on and `stage.sh status` shows the reviewer `on`, then say "review your change against the software factory standards, pass or fail per standard, with file and line" to the main agent instead. Same checklist, without the fresh context.
 
 **Say:**
 - "Treat agent code like a new teammate's pull request: read the diff, run the tests, review it."
@@ -180,7 +198,7 @@ Start a new session in **Plan** mode and type:
 ```bash
 git status --short
 ```
-**Say:** "Everything we added is a text file. Commit it and every developer who pulls this repository gets the same standards, guardrails and skill. Changes go through normal code review."
+**Say:** "Everything we added is a text file. Commit it and every developer who pulls this repository gets the same standards, guardrails, reviewer and skill. Changes go through normal code review."
 
 **Then the question Tim will ask: "How do I get this into all 40 repositories without copying it 40 times?"** Open the plugin folder:
 
@@ -188,10 +206,11 @@ git status --short
 demo-basics/plugin/sf-standards/
 ├── .devin-plugin/plugin.json                  # name, version, description
 ├── rules/software-factory-standards.md        # the rule from step 3
+├── agents/standards-reviewer.md               # the subagent from step 5
 └── skills/new-endpoint/SKILL.md               # the skill from step 7
 ```
 
-**Say:** "These are the same two files. The staging script copied them from here all along. A plugin is just a folder in a Git repository with a small manifest. Version it in one place, and every repository that uses it gets the update."
+**Say:** "These are the same three files. The staging script copied them from here all along. A plugin is just a folder in a Git repository with a small manifest. Version it in one place, and every repository that uses it gets the update."
 
 Open `demo-basics/plugin/how-to-require-it.jsonc`:
 - **One repository:** add `requiredPlugins` to that repository's `.devin/config.json`, pinned to a commit so updates are reviewed.
@@ -216,7 +235,7 @@ Open `demo-basics/plugin/how-to-require-it.jsonc`:
 ```bash
 bash demo-basics/stage.sh reset
 ```
-Removes the staged layers and the fake `.env`, restores `src/` to the committed version and deletes any new files the agent created under `src/`. **This discards all code changes under `src/`,** which is what you want between demo runs. Anything it lists afterwards (for example a file the agent saved under `.devin/`) is outside `src/`; check it before deleting. Then start a new session.
+Removes the staged layers and the fake `.env`, restores `src/` to the committed version and deletes any new files the agent created under `src/`. **This discards all code changes under `src/`,** which is what you want between demo runs. Anything it lists afterwards (for example a file the agent saved under `.devin/`) is outside `src/`; check it before deleting. Then run `bash demo-basics/stage.sh reviewer` again to preload the step 5 subagent, and start a new session.
 
 ## If something goes wrong
 
@@ -226,4 +245,5 @@ Removes the staged layers and the fake `.env`, restores `src/` to the committed 
 | Tests fail with `Unable to locate a Java Runtime` | `export JAVA_HOME=$(/usr/libexec/java_home -v 11)` in the terminal, then fully quit and reopen Devin Desktop. |
 | The agent is slow | Narrate the tool calls while you wait: that is the loop from step 1. |
 | Step 4 goes sideways | `git apply demo-basics/fallback/branches-endpoint.patch` |
+| The reviewer in step 5 does not run | Turn on Subagents (Preview) in Devin Settings, check `stage.sh status` shows `standards-reviewer.md` as `on`, and start a new session. Or ask the main agent for the same pass/fail review. |
 | The deny in step 6 does not trigger | Run `bash demo-basics/stage.sh status` (config.json should be `on`) and start a new session. Turn sandbox off and use Normal mode: in sandbox mode shell commands run without prompting. Use the production-properties prompt; the `.env` and push prompts are usually stopped earlier by `.gitignore` and SF-GIT-1. |

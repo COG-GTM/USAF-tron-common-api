@@ -25,22 +25,28 @@ case "${1:-status}" in
     cp "$P/skills/new-endpoint/SKILL.md" .devin/skills/new-endpoint/SKILL.md
     echo "Added .devin/skills/new-endpoint/SKILL.md. Type /new-endpoint in a new session."
     ;;
+  reviewer)
+    mkdir -p .devin/agents
+    cp "$P/agents/standards-reviewer.md" .devin/agents/standards-reviewer.md
+    echo "Added .devin/agents/standards-reviewer.md (a read-only subagent). Start a new session to load it."
+    ;;
   reset)
     rm -f .devin/rules/software-factory-standards.md .devin/config.json .env
     rm -rf .devin/skills/new-endpoint
-    rmdir .devin/rules .devin/skills .devin 2>/dev/null || true
+    rm -f .devin/agents/standards-reviewer.md
+    rmdir .devin/rules .devin/skills .devin/agents .devin 2>/dev/null || true
     git checkout -- src
     git clean -fq -- src
     echo "Back to the starting point. Untracked files left for you to review:"
     git status --short
     ;;
   status)
-    for f in .devin/rules/software-factory-standards.md .env .devin/config.json .devin/skills/new-endpoint/SKILL.md; do
+    for f in .devin/rules/software-factory-standards.md .env .devin/config.json .devin/skills/new-endpoint/SKILL.md .devin/agents/standards-reviewer.md; do
       if [ -e "$f" ]; then echo "  on   $f"; else echo "  off  $f"; fi
     done
     ;;
   *)
-    echo "usage: demo-basics/stage.sh standards|secret|guardrails|skill|reset|status" >&2
+    echo "usage: demo-basics/stage.sh standards|secret|guardrails|skill|reviewer|reset|status" >&2
     exit 2
     ;;
 esac
